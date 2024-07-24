@@ -17,7 +17,12 @@
 }
 
 :root {
-    --tw-text-opacity: 1;
+    --chart-width: 100%;
+    --chart-height: 100vh;
+    --font-size-title: 32px;
+    --font-size-legend: 14px;
+    --font-size-axis: 12px;
+    --padding-chart: 20px;
 }
 
 body {
@@ -233,84 +238,77 @@ body {
     cursor: not-allowed;
 }
 
-@media only screen 
-and (max-width: 428px) 
-and (max-height: 926px) 
-and (-webkit-min-device-pixel-ratio: 3) {
-    body {
-        width: 100%;
-        height: 100vh;
-        overflow: hidden;
+@media only screen and (max-width: 428px) {
+    :root {
+        --chart-width: 70vw;
+        --chart-height: 70vh;
+        --font-size-title: 16px;
+        --font-size-legend: 10px;
+        --font-size-axis: 8px;
+        --padding-chart: 5px;
     }
+}
 
-    #chartTitle {
-        font-size: 10px;
-        padding: 8px 0 5px;
-    }
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #121212;
+    color: #e0e0e0;
+}
 
-    #chartLegend {
-        font-size: 8px;
-        top: 65px;
-        padding: 5px 0;
-    }
+#chartContainer {
+    width: var(--chart-width);
+    height: var(--chart-height);
+    position: relative;
+}
 
-    #currentDate {
-        font-size: 14px;
-        top: 15px;
-        right: 5px;
-    }
+#marketCapChart {
+    width: 100% !important;
+    height: 100% !important;
+}
 
-    #yAxisTitle,
-    #xAxisTitle {
-        font-size: 10px;
-    }
+#chartTitle {
+    font-size: var(--font-size-title);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+}
 
-    #yAxisTitle {
-        left: 2px;
-        top: 50px;
-    }
+#chartLegend {
+    font-size: var(--font-size-legend);
+    position: absolute;
+    top: calc(var(--font-size-title) + 10px);
+    left: 0;
+    right: 0;
+    text-align: center;
+}
 
-    #xAxisTitle {
-        bottom: 10px;
-    }
+#yAxisTitle, #xAxisTitle {
+    font-size: var(--font-size-axis);
+    position: absolute;
+}
 
-    #chartContainer {
-        height: calc(100vh - 80px);
-        width: 100%;
-        margin-top: 60px;
-        padding-bottom: 10px;
-    }
+#yAxisTitle {
+    left: calc(-1 * var(--font-size-axis));
+    top: 50%;
+    transform: rotate(-90deg) translateX(-50%);
+    transform-origin: left top;
+}
 
-    #finalRankingContainer {
-        top: 80px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 90%;
-        max-width: 300px;
-        font-size: 12px;
-    }
+#xAxisTitle {
+    bottom: calc(-1 * var(--font-size-axis));
+    left: 50%;
+    transform: translateX(-50%);
+}
 
-    #finalRankingContainer h2 {
-        font-size: 16px;
-    }
-
-    .rank-item {
-        font-size: 6px;
-        margin-bottom: 5px;
-    }
-
-    .company-logo {
-        width: 10px;
-        height: 10px;
-    }
-
-    #buttonContainer {
-        bottom: 5px;
-    }
-
-    #animateButton,
-    #downloadVideoButton {
-        padding: 6px 12px;
-        font-size: 12px;
-    }
+#currentDate {
+    font-size: var(--font-size-legend);
+    position: absolute;
+    top: var(--padding-chart);
+    right: var(--padding-chart);
 }

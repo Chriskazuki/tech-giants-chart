@@ -102,45 +102,48 @@
         }
 
         async function createChart() {
-        const data = await loadData();
-        const ctx = document.getElementById('marketCapChart').getContext('2d');
-        
-        const isMobile = window.innerWidth <= 428;
-        
-        const totalDuration = isMobile ? 20000 : 30000;
-        const delayBetweenPoints = totalDuration / Math.max(...Object.values(data).map(d => d.length));
-        let currentDataIndex = 0;
+    const data = await loadData();
+    const ctx = document.getElementById('marketCapChart').getContext('2d');
+    
+    const computedStyle = getComputedStyle(document.documentElement);
+    const fontSize = parseFloat(computedStyle.getPropertyValue('--font-size-axis'));
+    const padding = parseFloat(computedStyle.getPropertyValue('--padding-chart'));
+    const isMobile = window.innerWidth <= 428; // We keep this for now, but it could be replaced by a CSS variable
+    
+    const totalDuration = isMobile ? 20000 : 30000;
+    const delayBetweenPoints = totalDuration / Math.max(...Object.values(data).map(d => d.length));
+    let currentDataIndex = 0;
 
-            const animation = {
-                x: {
-                    type: 'number',
-                    easing: 'linear',
-                    duration: delayBetweenPoints,
-                    from: NaN,
-                    delay(ctx) {
-                        if (ctx.type !== 'data' || ctx.xStarted) {
-                            return 0;
-                        }
-                        ctx.xStarted = true;
-                        return ctx.index * delayBetweenPoints;
-                    }
-                },
-                y: {
-                    type: 'number',
-                    easing: 'linear',
-                    duration: delayBetweenPoints,
-                    from: NaN,
-                    delay(ctx) {
-                        if (ctx.type !== 'data' || ctx.yStarted) {
-                            return 0;
-                        }
-                        ctx.yStarted = true;
-                        return ctx.index * delayBetweenPoints;
-                    }
+    const animation = {
+        x: {
+            type: 'number',
+            easing: 'linear',
+            duration: delayBetweenPoints,
+            from: NaN,
+            delay(ctx) {
+                if (ctx.type !== 'data' || ctx.xStarted) {
+                    return 0;
                 }
-            };
+                ctx.xStarted = true;
+                return ctx.index * delayBetweenPoints;
+            }
+        },
+        y: {
+            type: 'number',
+            easing: 'linear',
+            duration: delayBetweenPoints,
+            from: NaN,
+            delay(ctx) {
+                if (ctx.type !== 'data' || ctx.yStarted) {
+                    return 0;
+                }
+                ctx.yStarted = true;
+                return ctx.index * delayBetweenPoints;
+            }
+        }
+    };
 
-            const chartConfig = {
+    const chartConfig = {
         type: 'line',
         data: {
             datasets: companies.map(company => ({
@@ -162,10 +165,10 @@
             },
             layout: {
                 padding: {
-                    top: isMobile ? 10 : 20,
-                    right: isMobile ? 10 : 20,
-                    bottom: isMobile ? 60 : 120,
-                    left: isMobile ? 15 : 30
+                    top: padding,
+                    right: padding,
+                    bottom: padding * 2,
+                    left: padding
                 }
             },
             scales: {
@@ -177,7 +180,7 @@
                     },
                     ticks: {
                         font: {
-                            size: isMobile ? 8 : 12
+                            size: fontSize
                         },
                         maxRotation: isMobile ? 45 : 0,
                         autoSkip: true,
@@ -196,7 +199,7 @@
                             return '$' + Math.round(value) + (isMobile ? '' : 'B');
                         },
                         font: {
-                            size: isMobile ? 8 : 12
+                            size: fontSize
                         }
                     },
                     grid: {
@@ -230,9 +233,9 @@
                             content: isMobile ? company.name : `${company.name}: $${data[company.name][0].y.toFixed(2)}B`,
                             backgroundColor: company.color,
                             color: 'white',
-                            padding: isMobile ? 2 : 6,
+                            padding: isMobile ? padding / 2 : padding,
                             font: {
-                                size: isMobile ? 8 : 12
+                                size: fontSize
                             },
                             borderRadius: isMobile ? 2 : 4,
                             xAdjust: 0,
@@ -242,19 +245,19 @@
                 }
             }
         },
-                plugins: [{
-                    id: 'customAnimation',
-                    afterDraw: (chart) => {
-                        if (currentDataIndex < Math.max(...Object.values(data).map(d => d.length)) - 1) {
-                            currentDataIndex++;
-                            companies.forEach((company, index) => {
-                                const currentData = data[company.name][Math.min(currentDataIndex, data[company.name].length - 1)];
-                                chart.data.datasets[index].data = data[company.name].slice(0, currentDataIndex + 1);
-                                
-                                chart.options.plugins.annotation.annotations[`${company.name}Value`].content = `${company.name}: $${currentData.y.toFixed(2)}B`;
-                                chart.options.plugins.annotation.annotations[`${company.name}Value`].xValue = currentData.x;
-                                chart.options.plugins.annotation.annotations[`${company.name}Value`].yValue = currentData.y;
-                            });
+        plugins: [{
+            id: 'customAnimation',
+            afterDraw: (chart) => {
+                if (currentDataIndex < Math.max(...Object.values(data).map(d => d.length)) - 1) {
+                    currentDataIndex++;
+                    companies.forEach((company, index) => {
+                        const currentData = data[company.name][Math.min(currentDataIndex, data[company.name].length - 1)];
+                        chart.data.datasets[index].data = data[company.name].slice(0, currentDataIndex + 1);
+                        
+                        chart.options.plugins.annotation.annotations[`${company.name}Value`].content = `${company.name}: $${currentData.y.toFixed(2)}B`;
+                        chart.options.plugins.annotation.annotations[`${company.name}Value`].xValue = currentData.x;
+                        chart.options.plugins.annotation.annotations[`${company.name}Value`].yValue = currentData.y;
+                    });
                             
                             const visibleData = chart.data.datasets.flatMap(dataset => dataset.data);
                             const maxValue = Math.max(...visibleData.map(d => d.y));
@@ -327,18 +330,21 @@
         return;
     }
     
-    const isMobile = window.innerWidth <= 428;
+    const computedStyle = getComputedStyle(document.documentElement);
+    const fontSize = parseFloat(computedStyle.getPropertyValue('--font-size-axis'));
+    
     currentDataIndex = 0;
     companies.forEach((company, index) => {
         window.chart.data.datasets[index].data = [data[company.name][0]];
-        window.chart.options.plugins.annotation.annotations[`${company.name}Value`].content = isMobile ? company.name : `${company.name}: $${data[company.name][0].y.toFixed(2)}B`;
+        window.chart.options.plugins.annotation.annotations[`${company.name}Value`].content = `${company.name}: $${data[company.name][0].y.toFixed(2)}B`;
         window.chart.options.plugins.annotation.annotations[`${company.name}Value`].xValue = data[company.name][0].x;
         window.chart.options.plugins.annotation.annotations[`${company.name}Value`].yValue = data[company.name][0].y;
+        window.chart.options.plugins.annotation.annotations[`${company.name}Value`].font.size = fontSize;
     });
     window.chart.options.scales.y.max = Math.max(...Object.values(data).map(d => d[0].y)) * 1.1;
     window.chart.options.scales.x.min = Object.values(data)[0][0].x;
-    window.chart.options.scales.x.max = moment(Object.values(data)[0][0].x).add(isMobile ? 3 : 5, 'years').toDate();
-    document.getElementById('currentDate').textContent = moment(Object.values(data)[0][0].x).format(isMobile ? 'MM/DD/YY' : 'MMM D, YYYY');
+    window.chart.options.scales.x.max = moment(Object.values(data)[0][0].x).add(5, 'years').toDate();
+    document.getElementById('currentDate').textContent = moment(Object.values(data)[0][0].x).format('MMM D, YYYY');
     document.getElementById('finalRankingContainer').style.display = 'none';
     window.chart.update();
     
