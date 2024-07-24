@@ -236,21 +236,28 @@ body {
 @media only screen 
 and (device-width: 428px) 
 and (device-height: 926px) 
-and (-webkit-device-pixel-ratio: 3) 
-{
+and (-webkit-device-pixel-ratio: 3) {
+    body {
+        /* Ajuster pour les proportions de vidéo LinkedIn (1:1 ou 4:5) */
+        width: 428px;
+        height: 428px; /* Pour 1:1 */
+        /* height: 535px; */ /* Pour 4:5, décommentez si vous préférez ce ratio */
+        overflow: hidden;
+    }
+
     #chartTitle {
-        font-size: 12px;
+        font-size: 18px;
         padding: 10px 0 5px;
     }
 
     #chartLegend {
-        font-size: 12px;
-        top: 20px;
+        font-size: 14px;
+        top: 40px;
     }
 
     #currentDate {
-        font-size: 18px;
-        top: 30px;
+        font-size: 16px;
+        top: 10px;
         right: 10px;
     }
 
@@ -259,17 +266,51 @@ and (-webkit-device-pixel-ratio: 3)
         font-size: 12px;
     }
 
+    #yAxisTitle {
+        left: 5px;
+        top: 50px;
+    }
+
+    #xAxisTitle {
+        bottom: 20px;
+    }
+
     #chartContainer {
-        height: 50%;
-        width : 70%
-        margin-top: 80px;
+        height: calc(100% - 100px);
+        width: 100%;
+        margin-top: 60px;
+        padding-bottom: 20px;
     }
 
     #finalRankingContainer {
-        top: 100px;
+        top: 80px;
         left: 50%;
         transform: translateX(-50%);
         width: 80%;
         max-width: 250px;
+        font-size: 14px;
+    }
+
+    #finalRankingContainer h2 {
+        font-size: 18px;
+    }
+
+    .rank-item {
+        font-size: 14px;
+    }
+
+    .company-logo {
+        width: 30px;
+        height: 30px;
+    }
+
+    #buttonContainer {
+        bottom: 10px;
+    }
+
+    #animateButton,
+    #downloadVideoButton {
+        padding: 8px 16px;
+        font-size: 14px;
     }
 }
