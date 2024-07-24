@@ -19,10 +19,10 @@
 :root {
     --chart-width: 100%;
     --chart-height: 100vh;
-    --font-size-title: 32px;
-    --font-size-legend: 14px;
-    --font-size-axis: 12px;
-    --padding-chart: 20px;
+    --font-size-title: 28px;
+    --font-size-legend: 18px;
+    --font-size-axis: 14px;
+    --padding-chart: 16px;
 }
 
 body {
@@ -240,9 +240,9 @@ body {
 
 @media only screen and (max-width: 428px) {
     :root {
-        --chart-width: 70vw;
-        --chart-height: 70vh;
-        --font-size-title: 16px;
+        --chart-width: 100vw;
+        --chart-height: 60vh;
+        --font-size-title: 14px;
         --font-size-legend: 10px;
         --font-size-axis: 8px;
         --padding-chart: 5px;
