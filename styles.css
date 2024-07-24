@@ -244,19 +244,19 @@ and (-webkit-min-device-pixel-ratio: 3) {
     }
 
     #chartTitle {
-        font-size: 18px;
-        padding: 10px 0 5px;
+        font-size: 10px;
+        padding: 8px 0 5px;
     }
 
     #chartLegend {
-        font-size: 12px;
-        top: 40px;
+        font-size: 8px;
+        top: 65px;
         padding: 5px 0;
     }
 
     #currentDate {
         font-size: 14px;
-        top: 5px;
+        top: 15px;
         right: 5px;
     }
 
@@ -295,13 +295,13 @@ and (-webkit-min-device-pixel-ratio: 3) {
     }
 
     .rank-item {
-        font-size: 12px;
-        margin-bottom: 10px;
+        font-size: 6px;
+        margin-bottom: 5px;
     }
 
     .company-logo {
-        width: 25px;
-        height: 25px;
+        width: 10px;
+        height: 10px;
     }
 
     #buttonContainer {
