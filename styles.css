@@ -1,0 +1,244 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
+@font-face {
+    font-family: 'Neue Haas Display Black';
+    src: url('NeueHaasDisplayBlack.ttf') format('truetype');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Neue Haas Display';
+    src: url('NeueHaasDisplayRoman.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+:root {
+    --tw-text-opacity: 1;
+}
+
+body {
+    font-family: 'Inter', Helvetica, Arial, sans-serif;
+    background-color: #121212;
+    color: #e0e0e0;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow: hidden;
+}
+
+#yAxisTitle,
+#xAxisTitle {
+    font-family: 'Neue Haas Display Black', Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 900;
+    color: #ffffff;
+    position: absolute;
+    z-index: 1000;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+#yAxisTitle {
+    left: 15px;
+    top: -30px;
+    transform: none;
+}
+
+#xAxisTitle {
+    font-family: 'Neue Haas Display Black', Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 900;
+    color: #ffffff;
+    position: absolute;
+    bottom: 100px; /* Augmentez cette valeur négative pour descendre le titre */
+    left: 50%;
+    transform: translateX(-50%);
+    padding-bottom: 2px; /* Augmentez cette valeur pour plus d'espace */
+    z-index: 1000;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.media-ui-HedAndDek_wrapper {
+    font-family: 'Neue Haas Display', 'Inter', Helvetica, Arial, sans-serif;
+    color: rgba(255, 255, 255, var(--tw-text-opacity));
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+#chartTitle {
+    font-family: 'Neue Haas Display Black', Helvetica, Arial, sans-serif;
+    font-size: 32px;
+    font-weight: 900;
+    text-align: center;
+    color: #ffffff;
+    width: 100%;
+    padding: 20px 0 10px;
+    background-color: rgba(18, 18, 18, 0.8);
+    margin: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+#chartLegend {
+    font-family: 'Neue Haas Display', Helvetica, Arial, sans-serif;
+    width: 100%;
+    text-align: center;
+    padding: 10px 0;
+    background-color: rgba(18, 18, 18, 0.8);
+    position: fixed;
+    top: 70px;
+    left: 0;
+    z-index: 1000;
+    color: #ffffff;
+}
+
+#currentDate {
+    font-family: 'Neue Haas Display Black', Helvetica, Arial, sans-serif;
+    font-size: 24px;
+    /* Taille légèrement plus petite que le titre principal */
+    font-weight: 900;
+    color: #ffffff;
+    position: fixed;
+    top: 20px;
+    /* Ajustez cette valeur si nécessaire */
+    right: 20px;
+    z-index: 1001;
+    /* Assurez-vous qu'il est au-dessus des autres éléments */
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+#chartContainer {
+    width: 100vw;
+    height: calc(100vh - 110px);
+    /* Adjust based on title + legend height */
+    position: relative;
+    margin-top: 110px;
+    padding-bottom: 60px;
+    /* Should match the height subtracted above */
+}
+
+#marketCapChart {
+    width: 100% !important;
+    height: 100% !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: transparent !important;
+}
+
+
+/* Chart.js customization for transparent background */
+#marketCapChart {
+    background-color: transparent !important;
+}
+
+.chartjs-tooltip {
+    background-color: rgba(30, 30, 30, 0.8) !important;
+    color: #e0e0e0 !important;
+}
+
+.chartjs-tooltip-key {
+    border-color: #e0e0e0 !important;
+}
+
+#finalRankingContainer {
+    display: none;
+    position: absolute;
+    top: 140px; /* Ajustez cette valeur selon votre mise en page */
+    left: 100px;
+    width: 250px; /* Ajustez la largeur selon vos besoins */
+    background-color: rgba(18, 18, 18, 0.9);
+    padding: 30px;
+    border-radius: 10px;
+    z-index: 1000;
+    font-family: 'Neue Haas Display', Helvetica, Arial, sans-serif;
+    color: #ffffff;
+}
+
+#finalRankingContainer h2 {
+    font-family: 'Neue Haas Display Black', Helvetica, Arial, sans-serif;
+    font-size: 25px; /* Taille augmentée */
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.rank-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px; /* Espace augmenté entre les éléments */
+    font-size: 16px; /* Taille de police augmentée */
+}
+
+.rank {
+    font-weight: bold;
+    margin-right: 5px;
+    min-width: 20px;
+}
+
+.company-logo {
+    width: 40px; /* Ajustez selon la taille souhaitée pour les logos */
+    height: 40px;
+    object-fit: contain;
+    margin-right: 15px;
+}
+
+.value {
+    font-weight: bold;
+}
+#buttonContainer {
+    display: flex;
+    justify-content: center;
+    position: fixed;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+#animateButton,
+#downloadVideoButton {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin: 0 10px;
+}
+
+#animateButton {
+    background-color: #4CAF50;
+}
+
+#downloadVideoButton {
+    background-color: #008CBA;
+    display: none; /* Assurez-vous que le bouton est visible */
+}
+
+#animateButton:hover {
+    background-color: #45a049;
+}
+
+#downloadVideoButton:hover {
+    background-color: #007B9A;
+}
+
+#downloadVideoButton:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}

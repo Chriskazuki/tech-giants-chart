@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Giants Market Cap Chart</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.1/dist/chartjs-adapter-moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.1.0"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ffmpeg/0.10.1/ffmpeg.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/download/1.4.8/download.min.js"></script>
+    <style>
+        #progressContainer {
+            display: none;
+            width: 100%;
+            background-color: #f0f0f0;
+            padding: 3px;
+            border-radius: 3px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, .2);
+        }
+        #progressBar {
+            width: 0;
+            height: 20px;
+            background-color: #4CAF50;
+            border-radius: 3px;
+            transition: width 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="chartTitle">Tech Giants Market Capitalization Over Time</h1>
+    <div id="chartLegend"></div>
+    <div id="chartContainer">
+        <div id="yAxisTitle">Market Cap (Billions USD)</div>
+        <canvas id="marketCapChart"></canvas>
+        <div id="xAxisTitle">Year</div>
+        <div id="currentDate"></div>
+    </div>
+    <div id="finalRankingContainer">
+        <h2>Ranking</h2>
+        <div id="finalRanking"></div>
+    </div>
+    <div id="buttonContainer">
+        <button id="animateButton">Animate</button>
+        <button id="downloadVideoButton">Download Video</button>
+    </div>
+    <div id="progressContainer">
+        <div id="progressBar"></div>
+    </div>
+    <script>
+    
+    // Au début de votre script
+        if (document.URL.includes('render-d3-video')) {
+            window.currentTime = 0;
+            performance.now = () => window.currentTime;
+        }
+
+        // Fonction globale pour render-d3-video
+        window.renderD3Video = function renderD3Video({ width, height }) {
+            return new Promise(resolve => {
+                const chartContainer = document.getElementById('chartContainer');
+                chartContainer.style.width = `${width}px`;
+                chartContainer.style.height = `${height}px`;
+                
+                // Redimensionner le canvas de Chart.js
+                const canvas = document.getElementById('marketCapChart');
+                canvas.width = width;
+                canvas.height = height;
+                
+                // Mettre à jour le graphique
+                chart.resize();
+                
+                resolve();
+            });
+        };
+        const companies = [
+    { name: 'Apple', file: 'aapl_market_cap.json', color: 'rgba(255, 99, 132, 1)', logo: 'Apple_logo_white.svg' },
+    { name: 'Amazon', file: 'amzn_market_cap.json', color: 'rgba(255, 159, 64, 1)', logo: 'Amazon_logo.png' },
+    { name: 'Google', file: 'googl_market_cap.json', color: 'rgba(75, 192, 192, 1)', logo: 'Google__G__logo.svg'},
+    { name: 'Microsoft', file: 'msft_market_cap.json', color: 'rgba(54, 162, 235, 1)', logo: 'Microsoft_logo.svg' },
+    { name: 'NVIDIA', file: 'nvidia_market_cap.json', color: 'rgba(153, 102, 255, 1)', logo: 'Nvidia_logo.svg' }
+];
+
+        async function loadData() {
+            const dataPromises = companies.map(company => 
+                fetch(company.file).then(response => response.json())
+            );
+            const allData = await Promise.all(dataPromises);
+
+            const processData = (data) => data.map(item => ({
+                x: new Date(item.x),
+                y: item.y / 1e9  // Convert to billions
+            }));
+
+            const processedData = allData.map(processData);
+            const startDate = new Date(Math.max(...processedData.map(data => data[0].x.getTime())));
+
+            const filterFromStartDate = (data) => data.filter(item => item.x >= startDate);
+
+            return Object.fromEntries(companies.map((company, index) => [
+                company.name,
+                filterFromStartDate(processedData[index])
+            ]));
+        }
+       // Déclarations globales
+        let data;
+        let chart;
+        let delayBetweenPoints;
+        let animationInterval;
+
+        async function createChart() {
+            data = await loadData();
+            const ctx = document.getElementById('marketCapChart').getContext('2d');
+            
+            const totalDuration = 30000;
+            delayBetweenPoints = totalDuration / Math.max(...Object.values(data).map(d => d.length));
+            let currentDataIndex = 0;
+
+            const animation = {
+                x: {
+                    type: 'number',
+                    easing: 'linear',
+                    duration: delayBetweenPoints,
+                    from: NaN,
+                    delay(ctx) {
+                        if (ctx.type !== 'data' || ctx.xStarted) {
+                            return 0;
+                        }
+                        ctx.xStarted = true;
+                        return ctx.index * delayBetweenPoints;
+                    }
+                },
+                y: {
+                    type: 'number',
+                    easing: 'linear',
+                    duration: delayBetweenPoints,
+                    from: NaN,
+                    delay(ctx) {
+                        if (ctx.type !== 'data' || ctx.yStarted) {
+                            return 0;
+                        }
+                        ctx.yStarted = true;
+                        return ctx.index * delayBetweenPoints;
+                    }
+                }
+            };
+
+            const chartConfig = {
+                type: 'line',
+                data: {
+                    datasets: companies.map(company => ({
+                        label: company.name,
+                        data: [data[company.name][0]],
+                        borderColor: company.color,
+                        backgroundColor: company.color,
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        fill: false
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    animation,
+                    interaction: {
+                        intersect: false
+                    },
+                    layout: {
+            padding: {
+                top: 20,
+                right: 20,
+                bottom: 120, // Augmentez cette valeur pour laisser plus d'espace en bas
+                left: 30
+            }
+        },
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: { unit: 'year' },
+                            title: {
+                                display: false,
+                                text: 'Year',
+                                color: '#e0e0e0'
+                            },
+                            ticks: {
+                            font: {
+                                family: "'Neue Haas Display', Helvetica, Arial, sans-serif",
+                                weight: 'normal'
+                            },
+                            color: '#ffffff'
+                        },
+                        border: {
+                            width: 1,
+                            color: '#ffffff'
+                        },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            min: Object.values(data)[0][0].x,
+                            max: moment(Object.values(data)[0][0].x).add(2, 'years').toDate()
+                        },
+                        y: {
+                        title: {
+                            display: false
+                        },
+                        ticks: {
+                            callback: function(value, index, values) {
+                                return '$' + Math.round(value) + 'B';
+                            },
+                            font: {
+                                family: "'Neue Haas Display', Helvetica, Arial, sans-serif",
+                                weight: 'normal'
+                            },
+                            color: '#ffffff'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)',
+                            lineWidth: 1
+                        },
+                        border: {
+                            width: 1,
+                            color: '#ffffff'
+                        }
+                    },
+                    },
+                    plugins: {
+                        legend: {
+                        display: false
+                    },
+                        zoom: {
+                            zoom: {
+                                wheel: { enabled: true },
+                                pinch: { enabled: true },
+                                mode: 'xy'
+                            },
+                            pan: { enabled: true, mode: 'xy' }
+                        },
+                        title: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: context => {
+                                    let label = context.dataset.label || '';
+                                    if (label) label += ': ';
+                                    if (context.parsed.y !== null) {
+                                        label += '$' + context.parsed.y.toFixed(2) + ' Billion';
+                                    }
+                                    return label;
+                                }
+                            },
+                            backgroundColor: 'rgba(30, 30, 30, 0.8)',
+                            titleColor: '#e0e0e0',
+                            bodyColor: '#e0e0e0'
+                        },
+                        annotation: {
+                            annotations: Object.fromEntries(companies.map(company => [
+                                `${company.name}Value`,
+                                {
+                                    type: 'label',
+                                    xValue: data[company.name][0].x,
+                                    yValue: data[company.name][0].y,
+                                    content: `${company.name}: $${data[company.name][0].y.toFixed(2)}B`,
+                                    backgroundColor: company.color,
+                                    color: 'white',
+                                    padding: 6,
+                                    borderRadius: 4,
+                                    xAdjust: 0,
+                                    yAdjust: 0
+                                }
+                            ]))
+                        }
+                    }
+                },
+                plugins: [{
+            id: 'customAnimation',
+            afterDraw: (chart) => {
+                if (currentDataIndex < Math.max(...Object.values(data).map(d => d.length)) - 1) {
+                            currentDataIndex++;
+                            companies.forEach((company, index) => {
+                                const currentData = data[company.name][Math.min(currentDataIndex, data[company.name].length - 1)];
+                                chart.data.datasets[index].data = data[company.name].slice(0, currentDataIndex + 1);
+                                
+                                chart.options.plugins.annotation.annotations[`${company.name}Value`].content = `${company.name}: $${currentData.y.toFixed(2)}B`;
+                                chart.options.plugins.annotation.annotations[`${company.name}Value`].xValue = currentData.x;
+                                chart.options.plugins.annotation.annotations[`${company.name}Value`].yValue = currentData.y;
+                            });
+                            
+                            const visibleData = chart.data.datasets.flatMap(dataset => dataset.data);
+                            const maxValue = Math.max(...visibleData.map(d => d.y));
+                            chart.options.scales.y.max = maxValue * 1.1;
+
+                            const currentDate = new Date(Math.max(...companies.map(company => 
+                                data[company.name][Math.min(currentDataIndex, data[company.name].length - 1)].x
+                            )));
+                            chart.options.scales.x.max = moment(currentDate).add(1, 'years').toDate();
+
+                            document.getElementById('currentDate').textContent = moment(currentDate).format('MMMM D, YYYY');
+                            
+                            chart.update('none');
+                        } else {
+            // Display final ranking
+            const finalValues = companies.map(company => ({
+                name: company.name,
+                logo: company.logo,
+                value: data[company.name][data[company.name].length - 1].y
+            }));
+            finalValues.sort((a, b) => b.value - a.value);
+            const rankingHtml = finalValues.map((company, index) => 
+                `<div class="rank-item">
+                    <span class="rank">${index + 1}</span>
+                    <img src="${company.logo}" alt="${company.name}" class="company-logo">
+                    <span class="value">$${company.value.toFixed(2)}B</span>
+                 </div>`
+            ).join('');
+            document.getElementById('finalRanking').innerHTML = rankingHtml;
+            document.getElementById('finalRankingContainer').style.display = 'block';
+        }
+    }
+}]
+
+            };
+             // Fonction pour créer une légende personnalisée
+            function createCustomLegend(chart) {
+                const legendContainer = document.getElementById('chartLegend');
+                legendContainer.innerHTML = chart.data.datasets.map(dataset => 
+                    `<span style="display:inline-block; margin-right:10px; font-family: 'Neue Haas Display', Helvetica, Arial, sans-serif; color: #ffffff;">
+                    <span style="background-color:${dataset.borderColor}; 
+                                    width:10px; height:10px; display:inline-block; 
+                                    margin-right:5px;"></span>
+                    ${dataset.label}
+                    </span>`
+                ).join('');
+            }
+            
+            chart = new Chart(ctx, chartConfig);
+            createCustomLegend(chart)
+
+            document.getElementById('animateButton').addEventListener('click', () => {
+                currentDataIndex = 0;
+                companies.forEach((company, index) => {
+                    chart.data.datasets[index].data = [data[company.name][0]];
+                    chart.options.plugins.annotation.annotations[`${company.name}Value`].content = `${company.name}: $${data[company.name][0].y.toFixed(2)}B`;
+                    chart.options.plugins.annotation.annotations[`${company.name}Value`].xValue = data[company.name][0].x;
+                    chart.options.plugins.annotation.annotations[`${company.name}Value`].yValue = data[company.name][0].y;
+                });
+                chart.options.scales.y.max = Math.max(...Object.values(data).map(d => d[0].y)) * 1.1;
+                chart.options.scales.x.min = Object.values(data)[0][0].x;
+                chart.options.scales.x.max = moment(Object.values(data)[0][0].x).add(5, 'years').toDate();
+                document.getElementById('currentDate').textContent = moment(Object.values(data)[0][0].x).format('MMM D, YYYY');
+                document.getElementById('finalRankingContainer').style.display = 'none';
+            chart.update();
+        });
+        }
+        // Fonction pour capturer une image du graphique
+        async function captureChart() {
+            const chartContainer = document.getElementById('chartContainer');
+            const canvas = await html2canvas(chartContainer);
+            return canvas.toDataURL('image/png');
+        }
+
+        // Fonction pour créer une vidéo à partir des images capturées
+        async function createVideo(frames) {
+            const ffmpeg = FFmpeg.createWorker();
+            await ffmpeg.load();
+            await ffmpeg.write('frames.txt', frames.map((f, i) => `file ${i}.png`).join('\n'));
+            for (let i = 0; i < frames.length; i++) {
+                await ffmpeg.writeFile(`${i}.png`, frames[i].split(',')[1]);
+            }
+            await ffmpeg.exec(['-f', 'concat', '-i', 'frames.txt', '-vf', 'fps=30', '-pix_fmt', 'yuv420p', 'output.mp4']);
+            const data = await ffmpeg.read('output.mp4');
+            await ffmpeg.terminate();
+            return data;
+        }
+
+        // Fonction principale pour enregistrer et télécharger la vidéo
+        // Modifiez la fonction recordAndDownloadVideo comme suit :
+        async function resetChartAnimation() {
+    if (animationInterval) {
+        clearInterval(animationInterval);
+    }
+    
+    let currentDataIndex = 0;
+    const totalFrames = Math.max(...Object.values(data).map(d => d.length));
+
+    companies.forEach((company, index) => {
+        chart.data.datasets[index].data = [data[company.name][0]];
+    });
+    chart.options.scales.y.max = Math.max(...Object.values(data).map(d => d[0].y)) * 1.1;
+    chart.options.scales.x.min = Object.values(data)[0][0].x;
+    chart.options.scales.x.max = moment(Object.values(data)[0][0].x).add(5, 'years').toDate();
+    document.getElementById('currentDate').textContent = moment(Object.values(data)[0][0].x).format('MMM D, YYYY');
+    document.getElementById('finalRankingContainer').style.display = 'none';
+    chart.update();
+
+    return new Promise((resolve) => {
+        animationInterval = setInterval(() => {
+            if (currentDataIndex >= totalFrames - 1) {
+                clearInterval(animationInterval);
+                resolve();
+                return;
+            }
+
+            currentDataIndex++;
+            companies.forEach((company, index) => {
+                const currentData = data[company.name][Math.min(currentDataIndex, data[company.name].length - 1)];
+                chart.data.datasets[index].data = data[company.name].slice(0, currentDataIndex + 1);
+                
+                chart.options.plugins.annotation.annotations[`${company.name}Value`].content = `${company.name}: $${currentData.y.toFixed(2)}B`;
+                chart.options.plugins.annotation.annotations[`${company.name}Value`].xValue = currentData.x;
+                chart.options.plugins.annotation.annotations[`${company.name}Value`].yValue = currentData.y;
+            });
+            
+            const visibleData = chart.data.datasets.flatMap(dataset => dataset.data);
+            const maxValue = Math.max(...visibleData.map(d => d.y));
+            chart.options.scales.y.max = maxValue * 1.1;
+
+            const currentDate = new Date(Math.max(...companies.map(company => 
+                data[company.name][Math.min(currentDataIndex, data[company.name].length - 1)].x
+            )));
+            chart.options.scales.x.max = moment(currentDate).add(1, 'years').toDate();
+
+            document.getElementById('currentDate').textContent = moment(currentDate).format('MMMM D, YYYY');
+            
+            chart.update('none');
+        }, delayBetweenPoints);
+    });
+}
+
+async function recordAndDownloadVideo() {
+    const downloadButton = document.getElementById('downloadVideoButton');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+
+    downloadButton.disabled = true;
+    progressContainer.style.display = 'block';
+    progressBar.style.width = '0%';
+    downloadButton.textContent = 'Resetting animation...';
+
+    try {
+        // Réinitialiser et jouer l'animation
+        await resetChartAnimation();
+
+        downloadButton.textContent = 'Recording...';
+        
+        const frameSkip = 5; // Capture une image toutes les 5 frames
+        const frames = [];
+        const totalFrames = Math.max(...Object.values(data).map(d => d.length));
+        let currentDataIndex = 0;
+
+        while (currentDataIndex < totalFrames) {
+            // Mettre à jour le graphique
+            companies.forEach((company, index) => {
+                chart.data.datasets[index].data = data[company.name].slice(0, currentDataIndex + 1);
+            });
+            chart.update('none');
+
+            // Capturer l'image
+            if (currentDataIndex % frameSkip === 0) {
+                const frame = await captureChart();
+                frames.push(frame);
+            }
+
+            currentDataIndex++;
+            const progress = Math.round((currentDataIndex / totalFrames) * 100);
+            progressBar.style.width = `${progress}%`;
+            downloadButton.textContent = `Recording... ${progress}%`;
+
+            await new Promise(resolve => setTimeout(resolve, delayBetweenPoints));
+        }
+
+        downloadButton.textContent = 'Creating video...';
+        progressBar.style.width = '100%';
+        const videoData = await createVideo(frames);
+
+        // Télécharger la vidéo
+        download(new Blob([videoData]), 'chart_animation.mp4', 'video/mp4');
+
+        downloadButton.textContent = 'Download Video';
+    } catch (error) {
+        console.error('Error during video creation:', error);
+        downloadButton.textContent = 'Error: Try Again';
+    } finally {
+        downloadButton.disabled = false;
+        progressContainer.style.display = 'none';
+    }
+}
+
+// Initialisation
+createChart().then(() => {
+    document.getElementById('downloadVideoButton').addEventListener('click', recordAndDownloadVideo);
+});
+    </script>
+</body>
+</html>
