@@ -11,13 +11,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.1.0"></script>
     <script>
-            if (typeof window !== 'undefined' && window.renderD3Video) {
-        const fs = require('fs');
-        const logFile = fs.createWriteStream('render-log.txt', { flags: 'w' });
-        console.log = console.error = function(d) {
-            logFile.write(util.format(d) + '\n');
-        };
-    }
         console.log("Head script loaded");
         window.addEventListener('load', function() {
             console.log("Window loaded");
@@ -52,7 +45,7 @@
             { name: 'Microsoft', file: 'msft_market_cap.json', color: 'rgba(54, 162, 235, 1)', logo: 'Microsoft_logo.svg' },
             { name: 'NVIDIA', file: 'nvidia_market_cap.json', color: 'rgba(153, 102, 255, 1)', logo: 'Nvidia_logo.svg' }
         ];
-        let delayBetweenPoints;
+
         window.renderD3Video = function({ width, height }) {
         console.log("renderD3Video called with width:", width, "height:", height);
         return new Promise(resolve => {
@@ -81,52 +74,39 @@
                 
                 console.log("renderD3Video completed");
                 resolve();
-            }, 3000);
+            }, 1000);
         });
     };
         // Ajoutez ce code juste après la définition de window.renderD3Video
         console.log("renderD3Video is defined:", typeof window.renderD3Video === "function");
-
         async function loadData() {
-            console.log("Loading data...");
             const dataPromises = companies.map(company => 
-                fetch(company.file)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .catch(e => {
-                        console.error(`Error loading data for ${company.name}:`, e);
-                        return []; // Retourner un tableau vide en cas d'erreur
-                    })
+                fetch(company.file).then(response => response.json())
             );
             const allData = await Promise.all(dataPromises);
-            console.log("All data loaded");
 
             const processData = (data) => data.map(item => ({
                 x: new Date(item.x),
                 y: item.y / 1e9  // Convert to billions
             }));
 
-    const processedData = allData.map(processData);
-    const startDate = new Date(Math.max(...processedData.map(data => data[0]?.x?.getTime() || 0)));
+            const processedData = allData.map(processData);
+            const startDate = new Date(Math.max(...processedData.map(data => data[0].x.getTime())));
 
-    const filterFromStartDate = (data) => data.filter(item => item.x >= startDate);
+            const filterFromStartDate = (data) => data.filter(item => item.x >= startDate);
 
-    return Object.fromEntries(companies.map((company, index) => [
-        company.name,
-        filterFromStartDate(processedData[index])
-    ]));
-}
+            return Object.fromEntries(companies.map((company, index) => [
+                company.name,
+                filterFromStartDate(processedData[index])
+            ]));
+        }
 
         async function createChart() {
             const data = await loadData();
             const ctx = document.getElementById('marketCapChart').getContext('2d');
             
             const totalDuration = 30000;
-            window.delayBetweenPoints = totalDuration / Math.max(...Object.values(data).map(d => d.length));
+            const delayBetweenPoints = totalDuration / Math.max(...Object.values(data).map(d => d.length));
             let currentDataIndex = 0;
 
             const animation = {
@@ -335,6 +315,14 @@
             window.chart = new Chart(ctx, chartConfig);
             createCustomLegend(window.chart);
 
+            setTimeout(() => {
+                if (window.currentTime !== undefined) {
+                    window.renderD3Video({ width: 1920, height: 1080 }).then(() => {
+                        startAnimation();
+                    });
+                }
+            }, 100);
+
             return window.chart;
         }
 
@@ -352,57 +340,29 @@
         // ... (previous code remains the same)
 
         function startAnimation() {
-    console.log("startAnimation called");
-    if (!window.data || !window.chart) {
-        console.error('Data or chart not initialized');
-        return;
-    }
-    
-    let currentDataIndex = 0;
-    const maxFrames = 3600; // Nombre total de frames pour la vidéo (2 minutes à 30 fps)
-    let frameCount = 0;
-    
-    function animate() {
-        if (currentDataIndex < Math.max(...Object.values(window.data).map(d => d.length)) - 1 && frameCount < maxFrames) {
-            currentDataIndex++;
-            frameCount++;
-            
-            companies.forEach((company, index) => {
-                const currentData = window.data[company.name][Math.min(currentDataIndex, window.data[company.name].length - 1)];
-                window.chart.data.datasets[index].data = window.data[company.name].slice(0, currentDataIndex + 1);
-                
-                window.chart.options.plugins.annotation.annotations[`${company.name}Value`].content = `${company.name}: $${currentData.y.toFixed(2)}B`;
-                window.chart.options.plugins.annotation.annotations[`${company.name}Value`].xValue = currentData.x;
-                window.chart.options.plugins.annotation.annotations[`${company.name}Value`].yValue = currentData.y;
-            });
-            
-            const visibleData = window.chart.data.datasets.flatMap(dataset => dataset.data);
-            const maxValue = Math.max(...visibleData.map(d => d.y));
-            window.chart.options.scales.y.max = maxValue * 1.1;
-
-            const currentDate = new Date(Math.max(...companies.map(company => 
-                window.data[company.name][Math.min(currentDataIndex, window.data[company.name].length - 1)].x
-            )));
-            window.chart.options.scales.x.max = moment(currentDate).add(1, 'years').toDate();
-
-            document.getElementById('currentDate').textContent = moment(currentDate).format('MMMM D, YYYY');
-            
-            window.chart.update('none');
-
-            if (window.currentTime !== undefined) {
-                window.currentTime += window.delayBetweenPoints;
-                requestAnimationFrame(animate);
+            if (!data || !window.chart) {
+                console.error('Data or chart not initialized');
+                return;
             }
-        } else {
-            console.log("Animation completed");
-            if (window.renderD3Video && typeof window.renderD3Video.finish === 'function') {
-                window.renderD3Video.finish(); // Indiquez à render-d3-video que l'animation est terminée
+            
+            currentDataIndex = 0;
+            companies.forEach((company, index) => {
+                window.chart.data.datasets[index].data = [data[company.name][0]];
+                window.chart.options.plugins.annotation.annotations[`${company.name}Value`].content = `${company.name}: $${data[company.name][0].y.toFixed(2)}B`;
+                window.chart.options.plugins.annotation.annotations[`${company.name}Value`].xValue = data[company.name][0].x;
+                window.chart.options.plugins.annotation.annotations[`${company.name}Value`].yValue = data[company.name][0].y;
+            });
+            window.chart.options.scales.y.max = Math.max(...Object.values(data).map(d => d[0].y)) * 1.1;
+            window.chart.options.scales.x.min = Object.values(data)[0][0].x;
+            window.chart.options.scales.x.max = moment(Object.values(data)[0][0].x).add(5, 'years').toDate();
+            document.getElementById('currentDate').textContent = moment(Object.values(data)[0][0].x).format('MMM D, YYYY');
+            document.getElementById('finalRankingContainer').style.display = 'none';
+            window.chart.update();
+            
+            if (window.currentTime !== undefined) {
+                requestAnimationFrame(() => window.chart.draw());
             }
         }
-    }
-    
-    animate();
-}
         // À la fin de votre script, après toutes les définitions de fonctions :
 
         console.log("Script started");
@@ -411,20 +371,25 @@
 
         async function initializeChart() {
             console.log("initializeChart started");
-            window.data = await loadData();
+            data = await loadData();
             console.log("Data loaded");
             window.chart = await createChart();
             console.log("Chart created");
             
-            if (typeof window !== 'undefined' && window.renderD3Video && !window.animationStarted) {
-                console.log("Starting animation for video rendering");
-                window.currentTime = 0;
-                window.animationStarted = true;
+            if (window.currentTime !== undefined) {
+                console.log("Calling renderD3Video");
+                await window.renderD3Video({ width: 1920, height: 1080 });
+                console.log("renderD3Video completed");
                 startAnimation();
             }
             console.log("initializeChart completed");
-}
-        document.addEventListener('DOMContentLoaded', initializeChart);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("DOMContentLoaded event fired");
+            initializeChart();
+        });
+
         document.getElementById('animateButton').addEventListener('click', startAnimation);
 
         console.log("Script ended");
