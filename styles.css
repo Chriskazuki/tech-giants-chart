@@ -59,10 +59,10 @@ body {
     font-weight: 900;
     color: #ffffff;
     position: absolute;
-    bottom: 100px; /* Augmentez cette valeur négative pour descendre le titre */
+    bottom: 100px;
     left: 50%;
     transform: translateX(-50%);
-    padding-bottom: 2px; /* Augmentez cette valeur pour plus d'espace */
+    padding-bottom: 2px;
     z-index: 1000;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
@@ -106,15 +106,12 @@ body {
 #currentDate {
     font-family: 'Neue Haas Display Black', Helvetica, Arial, sans-serif;
     font-size: 24px;
-    /* Taille légèrement plus petite que le titre principal */
     font-weight: 900;
     color: #ffffff;
     position: fixed;
     top: 20px;
-    /* Ajustez cette valeur si nécessaire */
     right: 20px;
     z-index: 1001;
-    /* Assurez-vous qu'il est au-dessus des autres éléments */
     padding: 10px 15px;
     border-radius: 5px;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
@@ -123,11 +120,9 @@ body {
 #chartContainer {
     width: 100vw;
     height: calc(100vh - 110px);
-    /* Adjust based on title + legend height */
     position: relative;
     margin-top: 110px;
     padding-bottom: 60px;
-    /* Should match the height subtracted above */
 }
 
 #marketCapChart {
@@ -136,12 +131,6 @@ body {
     position: absolute;
     top: 0;
     left: 0;
-    background-color: transparent !important;
-}
-
-
-/* Chart.js customization for transparent background */
-#marketCapChart {
     background-color: transparent !important;
 }
 
@@ -157,9 +146,9 @@ body {
 #finalRankingContainer {
     display: none;
     position: absolute;
-    top: 140px; /* Ajustez cette valeur selon votre mise en page */
+    top: 140px;
     left: 100px;
-    width: 250px; /* Ajustez la largeur selon vos besoins */
+    width: 250px;
     background-color: rgba(18, 18, 18, 0.9);
     padding: 30px;
     border-radius: 10px;
@@ -170,7 +159,7 @@ body {
 
 #finalRankingContainer h2 {
     font-family: 'Neue Haas Display Black', Helvetica, Arial, sans-serif;
-    font-size: 25px; /* Taille augmentée */
+    font-size: 25px;
     margin-bottom: 20px;
     text-align: center;
 }
@@ -179,8 +168,8 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px; /* Espace augmenté entre les éléments */
-    font-size: 16px; /* Taille de police augmentée */
+    margin-bottom: 15px;
+    font-size: 16px;
 }
 
 .rank {
@@ -190,7 +179,7 @@ body {
 }
 
 .company-logo {
-    width: 40px; /* Ajustez selon la taille souhaitée pour les logos */
+    width: 40px;
     height: 40px;
     object-fit: contain;
     margin-right: 15px;
@@ -199,6 +188,7 @@ body {
 .value {
     font-weight: bold;
 }
+
 #buttonContainer {
     display: flex;
     justify-content: center;
@@ -227,7 +217,7 @@ body {
 
 #downloadVideoButton {
     background-color: #008CBA;
-    display: none; /* Assurez-vous que le bouton est visible */
+    display: none;
 }
 
 #animateButton:hover {
@@ -241,4 +231,40 @@ body {
 #downloadVideoButton:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    #chartTitle {
+        font-size: 24px;
+        padding: 10px 0 5px;
+    }
+
+    #chartLegend {
+        font-size: 12px;
+        top: 50px;
+    }
+
+    #currentDate {
+        font-size: 18px;
+        top: 10px;
+        right: 10px;
+    }
+
+    #yAxisTitle,
+    #xAxisTitle {
+        font-size: 12px;
+    }
+
+    #chartContainer {
+        height: calc(100vh - 80px);
+        margin-top: 80px;
+    }
+
+    #finalRankingContainer {
+        top: 100px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80%;
+        max-width: 250px;
+    }
 }
