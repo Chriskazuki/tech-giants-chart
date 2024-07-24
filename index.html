@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>Tech Giants Market Cap Chart</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -102,12 +102,14 @@
         }
 
         async function createChart() {
-            const data = await loadData();
-            const ctx = document.getElementById('marketCapChart').getContext('2d');
-            
-            const totalDuration = 30000;
-            const delayBetweenPoints = totalDuration / Math.max(...Object.values(data).map(d => d.length));
-            let currentDataIndex = 0;
+        const data = await loadData();
+        const ctx = document.getElementById('marketCapChart').getContext('2d');
+        
+        const isMobile = window.innerWidth <= 428;
+        
+        const totalDuration = isMobile ? 20000 : 30000;
+        const delayBetweenPoints = totalDuration / Math.max(...Object.values(data).map(d => d.length));
+        let currentDataIndex = 0;
 
             const animation = {
                 x: {
@@ -139,127 +141,107 @@
             };
 
             const chartConfig = {
-                type: 'line',
-                data: {
-                    datasets: companies.map(company => ({
-                        label: company.name,
-                        data: [data[company.name][0]],
-                        borderColor: company.color,
-                        backgroundColor: company.color,
-                        borderWidth: 2,
-                        pointRadius: 0,
-                        fill: false
-                    }))
-                },
-                options: {
-                    responsive: true,
-                    animation,
-                    interaction: {
-                        intersect: false
+        type: 'line',
+        data: {
+            datasets: companies.map(company => ({
+                label: company.name,
+                data: [data[company.name][0]],
+                borderColor: company.color,
+                backgroundColor: company.color,
+                borderWidth: isMobile ? 1 : 2,
+                pointRadius: 0,
+                fill: false
+            }))
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation,
+            interaction: {
+                intersect: false
+            },
+            layout: {
+                padding: {
+                    top: isMobile ? 10 : 20,
+                    right: isMobile ? 10 : 20,
+                    bottom: isMobile ? 60 : 120,
+                    left: isMobile ? 15 : 30
+                }
+            },
+            scales: {
+                x: {
+                    type: 'time',
+                    time: { unit: 'year' },
+                    title: {
+                        display: false,
                     },
-                    layout: {
-                        padding: {
-                            top: 20,
-                            right: 20,
-                            bottom: 120,
-                            left: 30
-                        }
+                    ticks: {
+                        font: {
+                            size: isMobile ? 8 : 12
+                        },
+                        maxRotation: isMobile ? 45 : 0,
+                        autoSkip: true,
+                        maxTicksLimit: isMobile ? 5 : 10
                     },
-                    scales: {
-                        x: {
-                            type: 'time',
-                            time: { unit: 'year' },
-                            title: {
-                                display: false,
-                                text: 'Year',
-                                color: '#e0e0e0'
-                            },
-                            ticks: {
-                                font: {
-                                    family: "'Neue Haas Display', Helvetica, Arial, sans-serif",
-                                    weight: 'normal'
-                                },
-                                color: '#ffffff'
-                            },
-                            border: {
-                                width: 1,
-                                color: '#ffffff'
-                            },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                            min: Object.values(data)[0][0].x,
-                            max: moment(Object.values(data)[0][0].x).add(2, 'years').toDate()
-                        },
-                        y: {
-                            title: {
-                                display: false
-                            },
-                            ticks: {
-                                callback: function(value, index, values) {
-                                    return '$' + Math.round(value) + 'B';
-                                },
-                                font: {
-                                    family: "'Neue Haas Display', Helvetica, Arial, sans-serif",
-                                    weight: 'normal'
-                                },
-                                color: '#ffffff'
-                            },
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)',
-                                lineWidth: 1
-                            },
-                            border: {
-                                width: 1,
-                                color: '#ffffff'
-                            }
-                        },
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        zoom: {
-                            zoom: {
-                                wheel: { enabled: true },
-                                pinch: { enabled: true },
-                                mode: 'xy'
-                            },
-                            pan: { enabled: true, mode: 'xy' }
-                        },
-                        title: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: context => {
-                                    let label = context.dataset.label || '';
-                                    if (label) label += ': ';
-                                    if (context.parsed.y !== null) {
-                                        label += '$' + context.parsed.y.toFixed(2) + ' Billion';
-                                    }
-                                    return label;
-                                }
-                            },
-                            backgroundColor: 'rgba(30, 30, 30, 0.8)',
-                            titleColor: '#e0e0e0',
-                            bodyColor: '#e0e0e0'
-                        },
-                        annotation: {
-                            annotations: Object.fromEntries(companies.map(company => [
-                                `${company.name}Value`,
-                                {
-                                    type: 'label',
-                                    xValue: data[company.name][0].x,
-                                    yValue: data[company.name][0].y,
-                                    content: `${company.name}: $${data[company.name][0].y.toFixed(2)}B`,
-                                    backgroundColor: company.color,
-                                    color: 'white',
-                                    padding: 6,
-                                    borderRadius: 4,
-                                    xAdjust: 0,
-                                    yAdjust: 0
-                                }
-                            ]))
-                        }
+                    grid: { 
+                        display: !isMobile 
                     }
                 },
+                y: {
+                    title: {
+                        display: false
+                    },
+                    ticks: {
+                        callback: function(value, index, values) {
+                            return '$' + Math.round(value) + (isMobile ? '' : 'B');
+                        },
+                        font: {
+                            size: isMobile ? 8 : 12
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)',
+                        lineWidth: isMobile ? 0.5 : 1
+                    }
+                },
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                zoom: {
+                    zoom: {
+                        wheel: { enabled: !isMobile },
+                        pinch: { enabled: isMobile },
+                        mode: 'xy'
+                    },
+                    pan: { enabled: true, mode: 'xy' }
+                },
+                tooltip: {
+                    enabled: !isMobile
+                },
+                annotation: {
+                    annotations: Object.fromEntries(companies.map(company => [
+                        `${company.name}Value`,
+                        {
+                            type: 'label',
+                            xValue: data[company.name][0].x,
+                            yValue: data[company.name][0].y,
+                            content: isMobile ? company.name : `${company.name}: $${data[company.name][0].y.toFixed(2)}B`,
+                            backgroundColor: company.color,
+                            color: 'white',
+                            padding: isMobile ? 2 : 6,
+                            font: {
+                                size: isMobile ? 8 : 12
+                            },
+                            borderRadius: isMobile ? 2 : 4,
+                            xAdjust: 0,
+                            yAdjust: 0
+                        }
+                    ]))
+                }
+            }
+        },
                 plugins: [{
                     id: 'customAnimation',
                     afterDraw: (chart) => {
@@ -340,29 +322,30 @@
         // ... (previous code remains the same)
 
         function startAnimation() {
-            if (!data || !window.chart) {
-                console.error('Data or chart not initialized');
-                return;
-            }
-            
-            currentDataIndex = 0;
-            companies.forEach((company, index) => {
-                window.chart.data.datasets[index].data = [data[company.name][0]];
-                window.chart.options.plugins.annotation.annotations[`${company.name}Value`].content = `${company.name}: $${data[company.name][0].y.toFixed(2)}B`;
-                window.chart.options.plugins.annotation.annotations[`${company.name}Value`].xValue = data[company.name][0].x;
-                window.chart.options.plugins.annotation.annotations[`${company.name}Value`].yValue = data[company.name][0].y;
-            });
-            window.chart.options.scales.y.max = Math.max(...Object.values(data).map(d => d[0].y)) * 1.1;
-            window.chart.options.scales.x.min = Object.values(data)[0][0].x;
-            window.chart.options.scales.x.max = moment(Object.values(data)[0][0].x).add(5, 'years').toDate();
-            document.getElementById('currentDate').textContent = moment(Object.values(data)[0][0].x).format('MMM D, YYYY');
-            document.getElementById('finalRankingContainer').style.display = 'none';
-            window.chart.update();
-            
-            if (window.currentTime !== undefined) {
-                requestAnimationFrame(() => window.chart.draw());
-            }
-        }
+    if (!data || !window.chart) {
+        console.error('Data or chart not initialized');
+        return;
+    }
+    
+    const isMobile = window.innerWidth <= 428;
+    currentDataIndex = 0;
+    companies.forEach((company, index) => {
+        window.chart.data.datasets[index].data = [data[company.name][0]];
+        window.chart.options.plugins.annotation.annotations[`${company.name}Value`].content = isMobile ? company.name : `${company.name}: $${data[company.name][0].y.toFixed(2)}B`;
+        window.chart.options.plugins.annotation.annotations[`${company.name}Value`].xValue = data[company.name][0].x;
+        window.chart.options.plugins.annotation.annotations[`${company.name}Value`].yValue = data[company.name][0].y;
+    });
+    window.chart.options.scales.y.max = Math.max(...Object.values(data).map(d => d[0].y)) * 1.1;
+    window.chart.options.scales.x.min = Object.values(data)[0][0].x;
+    window.chart.options.scales.x.max = moment(Object.values(data)[0][0].x).add(isMobile ? 3 : 5, 'years').toDate();
+    document.getElementById('currentDate').textContent = moment(Object.values(data)[0][0].x).format(isMobile ? 'MM/DD/YY' : 'MMM D, YYYY');
+    document.getElementById('finalRankingContainer').style.display = 'none';
+    window.chart.update();
+    
+    if (window.currentTime !== undefined) {
+        requestAnimationFrame(() => window.chart.draw());
+    }
+}
         // À la fin de votre script, après toutes les définitions de fonctions :
 
         console.log("Script started");
