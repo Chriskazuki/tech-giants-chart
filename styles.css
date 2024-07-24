@@ -233,20 +233,24 @@ body {
     cursor: not-allowed;
 }
 
-@media (max-width: 768px) {
+@media only screen 
+and (device-width: 428px) 
+and (device-height: 926px) 
+and (-webkit-device-pixel-ratio: 3) 
+{
     #chartTitle {
-        font-size: 24px;
+        font-size: 12px;
         padding: 10px 0 5px;
     }
 
     #chartLegend {
         font-size: 12px;
-        top: 50px;
+        top: 20px;
     }
 
     #currentDate {
         font-size: 18px;
-        top: 10px;
+        top: 30px;
         right: 10px;
     }
 
@@ -256,7 +260,8 @@ body {
     }
 
     #chartContainer {
-        height: calc(100vh - 80px);
+        height: 50%;
+        width : 70%
         margin-top: 80px;
     }
 
