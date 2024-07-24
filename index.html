@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Tech Giants Market Cap Chart</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -47,38 +47,39 @@
         ];
 
         window.renderD3Video = function({ width, height }) {
-        console.log("renderD3Video called with width:", width, "height:", height);
-        return new Promise(resolve => {
-            setTimeout(() => {
-                const chartContainer = document.getElementById('chartContainer');
-                if (chartContainer) {
-                    chartContainer.style.width = `${width}px`;
-                    chartContainer.style.height = `${height}px`;
-                } else {
-                    console.error('chartContainer not found');
-                }
-                
-                const canvas = document.getElementById('marketCapChart');
-                if (canvas) {
-                    canvas.width = width;
-                    canvas.height = height;
-                } else {
-                    console.error('marketCapChart canvas not found');
-                }
-                
-                if (window.chart && typeof window.chart.resize === 'function') {
-                    window.chart.resize();
-                } else {
-                    console.error('window.chart not found or resize is not a function');
-                }
-                
-                console.log("renderD3Video completed");
-                resolve();
-            }, 1000);
-        });
-    };
-        // Ajoutez ce code juste après la définition de window.renderD3Video
+            console.log("renderD3Video called with width:", width, "height:", height);
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    const chartContainer = document.getElementById('chartContainer');
+                    if (chartContainer) {
+                        chartContainer.style.width = `${width}px`;
+                        chartContainer.style.height = `${height}px`;
+                    } else {
+                        console.error('chartContainer not found');
+                    }
+                    
+                    const canvas = document.getElementById('marketCapChart');
+                    if (canvas) {
+                        canvas.width = width;
+                        canvas.height = height;
+                    } else {
+                        console.error('marketCapChart canvas not found');
+                    }
+                    
+                    if (window.chart && typeof window.chart.resize === 'function') {
+                        window.chart.resize();
+                    } else {
+                        console.error('window.chart not found or resize is not a function');
+                    }
+                    
+                    console.log("renderD3Video completed");
+                    resolve();
+                }, 1000);
+            });
+        };
+
         console.log("renderD3Video is defined:", typeof window.renderD3Video === "function");
+        
         async function loadData() {
             const dataPromises = companies.map(company => 
                 fetch(company.file).then(response => response.json())
@@ -101,12 +102,25 @@
             ]));
         }
 
+        function reduceDataPoints(data, maxPoints) {
+            if (data.length <= maxPoints) return data;
+            const step = Math.ceil(data.length / maxPoints);
+            return data.filter((_, index) => index % step === 0);
+        }
+
         async function createChart() {
             const data = await loadData();
             const ctx = document.getElementById('marketCapChart').getContext('2d');
             
+            const isMobile = window.innerWidth < 768;
+            const maxPoints = isMobile ? 100 : 1000;
+
+            const chartData = Object.fromEntries(
+                Object.entries(data).map(([key, value]) => [key, reduceDataPoints(value, maxPoints)])
+            );
+            
             const totalDuration = 30000;
-            const delayBetweenPoints = totalDuration / Math.max(...Object.values(data).map(d => d.length));
+            const delayBetweenPoints = totalDuration / Math.max(...Object.values(chartData).map(d => d.length));
             let currentDataIndex = 0;
 
             const animation = {
@@ -143,7 +157,7 @@
                 data: {
                     datasets: companies.map(company => ({
                         label: company.name,
-                        data: [data[company.name][0]],
+                        data: [chartData[company.name][0]],
                         borderColor: company.color,
                         backgroundColor: company.color,
                         borderWidth: 2,
@@ -153,6 +167,7 @@
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     animation,
                     interaction: {
                         intersect: false
@@ -179,15 +194,18 @@
                                     family: "'Neue Haas Display', Helvetica, Arial, sans-serif",
                                     weight: 'normal'
                                 },
-                                color: '#ffffff'
+                                color: '#ffffff',
+                                maxRotation: 0,
+                                autoSkip: true,
+                                maxTicksLimit: 5
                             },
                             border: {
                                 width: 1,
                                 color: '#ffffff'
                             },
                             grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                            min: Object.values(data)[0][0].x,
-                            max: moment(Object.values(data)[0][0].x).add(2, 'years').toDate()
+                            min: Object.values(chartData)[0][0].x,
+                            max: moment(Object.values(chartData)[0][0].x).add(2, 'years').toDate()
                         },
                         y: {
                             title: {
@@ -201,7 +219,8 @@
                                     family: "'Neue Haas Display', Helvetica, Arial, sans-serif",
                                     weight: 'normal'
                                 },
-                                color: '#ffffff'
+                                color: '#ffffff',
+                                maxTicksLimit: 5
                             },
                             grid: {
                                 color: 'rgba(255, 255, 255, 0.1)',
@@ -223,7 +242,11 @@
                                 pinch: { enabled: true },
                                 mode: 'xy'
                             },
-                            pan: { enabled: true, mode: 'xy' }
+                            pan: {
+                                enabled: true,
+                                mode: 'xy',
+                                threshold: 10,
+                            }
                         },
                         title: { display: false },
                         tooltip: {
@@ -246,15 +269,23 @@
                                 `${company.name}Value`,
                                 {
                                     type: 'label',
-                                    xValue: data[company.name][0].x,
-                                    yValue: data[company.name][0].y,
-                                    content: `${company.name}: $${data[company.name][0].y.toFixed(2)}B`,
+                                    xValue: chartData[company.name][0].x,
+                                    yValue: chartData[company.name][0].y,
+                                    content: `${company.name}: $${chartData[company.name][0].y.toFixed(2)}B`,
                                     backgroundColor: company.color,
                                     color: 'white',
                                     padding: 6,
                                     borderRadius: 4,
                                     xAdjust: 0,
-                                    yAdjust: 0
+                                    yAdjust: 0,
+                                    display: function(context) {
+                                        return context.chart.width > 500;
+                                    },
+                                    font: {
+                                        size: function(context) {
+                                            return context.chart.width < 500 ? 10 : 12;
+                                        }
+                                    }
                                 }
                             ]))
                         }
@@ -263,11 +294,11 @@
                 plugins: [{
                     id: 'customAnimation',
                     afterDraw: (chart) => {
-                        if (currentDataIndex < Math.max(...Object.values(data).map(d => d.length)) - 1) {
+                        if (currentDataIndex < Math.max(...Object.values(chartData).map(d => d.length)) - 1) {
                             currentDataIndex++;
                             companies.forEach((company, index) => {
-                                const currentData = data[company.name][Math.min(currentDataIndex, data[company.name].length - 1)];
-                                chart.data.datasets[index].data = data[company.name].slice(0, currentDataIndex + 1);
+                                const currentData = chartData[company.name][Math.min(currentDataIndex, chartData[company.name].length - 1)];
+                                chart.data.datasets[index].data = chartData[company.name].slice(0, currentDataIndex + 1);
                                 
                                 chart.options.plugins.annotation.annotations[`${company.name}Value`].content = `${company.name}: $${currentData.y.toFixed(2)}B`;
                                 chart.options.plugins.annotation.annotations[`${company.name}Value`].xValue = currentData.x;
@@ -279,7 +310,7 @@
                             chart.options.scales.y.max = maxValue * 1.1;
 
                             const currentDate = new Date(Math.max(...companies.map(company => 
-                                data[company.name][Math.min(currentDataIndex, data[company.name].length - 1)].x
+                                chartData[company.name][Math.min(currentDataIndex, chartData[company.name].length - 1)].x
                             )));
                             chart.options.scales.x.max = moment(currentDate).add(1, 'years').toDate();
 
@@ -295,7 +326,7 @@
                             const finalValues = companies.map(company => ({
                                 name: company.name,
                                 logo: company.logo,
-                                value: data[company.name][data[company.name].length - 1].y
+                                value: chartData[company.name][chartData[company.name].length - 1].y
                             }));
                             finalValues.sort((a, b) => b.value - a.value);
                             const rankingHtml = finalValues.map((company, index) => 
@@ -329,7 +360,7 @@
         function createCustomLegend(chart) {
             const legendContainer = document.getElementById('chartLegend');
             legendContainer.innerHTML = chart.data.datasets.map(dataset => 
-                `<span style="display:inline-block; margin-right:10px; font-family: 'Neue Haas Display', Helvetica, Arial, sans-serif; color: #ffffff;">
+                `<span style="display:inline-block; margin: 5px; font-family: 'Neue Haas Display', Helvetica, Arial, sans-serif; color: #ffffff;">
                 <span style="background-color:${dataset.borderColor}; 
                                 width:10px; height:10px; display:inline-block; 
                                 margin-right:5px;"></span>
@@ -337,8 +368,6 @@
                 </span>`
             ).join('');
         }
-        // ... (previous code remains the same)
-
         function startAnimation() {
             if (!data || !window.chart) {
                 console.error('Data or chart not initialized');
@@ -363,7 +392,6 @@
                 requestAnimationFrame(() => window.chart.draw());
             }
         }
-        // À la fin de votre script, après toutes les définitions de fonctions :
 
         console.log("Script started");
 
@@ -385,6 +413,15 @@
             console.log("initializeChart completed");
         }
 
+        function resizeChart() {
+            if (window.chart) {
+                window.chart.resize();
+                window.chart.update('none');
+            }
+        }
+
+        window.addEventListener('resize', resizeChart);
+
         document.addEventListener('DOMContentLoaded', () => {
             console.log("DOMContentLoaded event fired");
             initializeChart();
@@ -394,6 +431,5 @@
 
         console.log("Script ended");
     </script>
-  
 </body>
 </html>
