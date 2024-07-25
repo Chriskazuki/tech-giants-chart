@@ -216,10 +216,10 @@ body {
         and (device-height: 926px) 
         and (-webkit-device-pixel-ratio: 3) { 
     :root {
-        --font-size-title: 18px;
-        --font-size-legend: 12px;
+        --font-size-title: 12px;
+        --font-size-legend: 8px;
         --font-size-axis: 8px;
-        --padding-chart: 5px;
+        --padding-chart: 1px;
     }
     
     #chartTitle {
@@ -234,7 +234,7 @@ body {
     }
     
     #currentDate {
-        top: 5px;
+        top: 10px;
         left: 5px;
         right: auto;
         font-size: 14px;
@@ -246,6 +246,5 @@ body {
     
     #chartContainer {
         padding-top: 10px;
-        padding-bottom: 10px;
     }
 }
