@@ -45,7 +45,14 @@
             { name: 'Microsoft', file: 'msft_market_cap.json', color: 'rgba(54, 162, 235, 1)', logo: 'Microsoft_logo.svg' },
             { name: 'NVIDIA', file: 'nvidia_market_cap.json', color: 'rgba(153, 102, 255, 1)', logo: 'Nvidia_logo.svg' }
         ];
+        const isMobile = window.innerWidth <= 428;
 
+        const getCompactLabel = (company, value) => {
+            if (isMobile) {
+                return `${company.substr(0, 3)}: $${Math.round(value)}B`;
+            }
+            return `${company}: $${value.toFixed(2)}B`;
+        };
         window.renderD3Video = function({ width, height }) {
         console.log("renderD3Video called with width:", width, "height:", height);
         return new Promise(resolve => {
@@ -101,15 +108,19 @@
             ]));
         }
 
-        async function createChart() {
+    async function createChart() {
     const data = await loadData();
     const ctx = document.getElementById('marketCapChart').getContext('2d');
     
     const computedStyle = getComputedStyle(document.documentElement);
     const fontSize = parseFloat(computedStyle.getPropertyValue('--font-size-axis'));
     const padding = parseFloat(computedStyle.getPropertyValue('--padding-chart'));
-    const isMobile = window.innerWidth <= 428; // We keep this for now, but it could be replaced by a CSS variable
+    const isMobile = window.innerWidth <= 428;; // We keep this for now, but it could be replaced by a CSS variable
+    const chartContainer = document.getElementById('chartContainer');
     
+    if (isMobile) {
+        chartContainer.style.height = '60vh';
+    }
     const totalDuration = isMobile ? 20000 : 30000;
     const delayBetweenPoints = totalDuration / Math.max(...Object.values(data).map(d => d.length));
     let currentDataIndex = 0;
@@ -180,7 +191,7 @@
                     },
                     ticks: {
                         font: {
-                            size: fontSize
+                            size: isMobile ? 10 : 14
                         },
                         maxRotation: isMobile ? 45 : 0,
                         autoSkip: true,
@@ -195,13 +206,11 @@
                         display: false
                     },
                     ticks: {
-                        callback: function(value, index, values) {
-                            return '$' + Math.round(value) + (isMobile ? '' : 'B');
-                        },
-                        font: {
-                            size: fontSize
-                        }
-                    },
+            callback: function(value, index, values) {
+                return '$' + Math.round(value) + (isMobile ? '' : 'B');
+            },
+            maxTicksLimit: isMobile ? 5 : 10, // Réduisez le nombre de graduations sur mobile
+        },
                     grid: {
                         color: 'rgba(255, 255, 255, 0.1)',
                         lineWidth: isMobile ? 0.5 : 1
@@ -228,6 +237,7 @@
                         `${company.name}Value`,
                         {
                             type: 'label',
+                            content: getCompactLabel(company.name, data[company.name][0].y),
                             xValue: data[company.name][0].x,
                             yValue: data[company.name][0].y,
                             content: isMobile ? company.name : `${company.name}: $${data[company.name][0].y.toFixed(2)}B`,
@@ -248,6 +258,7 @@
         plugins: [{
             id: 'customAnimation',
             afterDraw: (chart) => {
+                adjustLabelPositions(Object.values(chart.options.plugins.annotation.annotations));
                 if (currentDataIndex < Math.max(...Object.values(data).map(d => d.length)) - 1) {
                     currentDataIndex++;
                     companies.forEach((company, index) => {
@@ -378,6 +389,19 @@
             console.log("DOMContentLoaded event fired");
             initializeChart();
         });
+
+        function adjustLabelPositions(annotations) {
+    const sortedAnnotations = [...annotations].sort((a, b) => a.yValue - b.yValue);
+    let lastY = -Infinity;
+    const minSpace = 30; // Espace minimal entre les labels
+    
+    sortedAnnotations.forEach(annotation => {
+        if (annotation.yValue < lastY + minSpace) {
+            annotation.yValue = lastY + minSpace;
+        }
+        lastY = annotation.yValue;
+    });
+}
 
         document.getElementById('animateButton').addEventListener('click', startAnimation);
 

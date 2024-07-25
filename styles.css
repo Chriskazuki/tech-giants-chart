@@ -60,23 +60,6 @@ body {
     position: absolute;
     bottom: 100px;
     left: 50%;
-
-    
-          
-            
-    
-
-          
-          Expand Down
-          
-            
-    
-
-          
-          Expand Up
-    
-    @@ -200,49 +200,49 @@
-  
     transform: translateX(-50%);
     padding-bottom: 2px;
     z-index: 1000;
@@ -230,66 +213,36 @@ body {
 
 @media only screen and (max-width: 428px) {
     :root {
-        --chart-width: 100vw;
-        --chart-height: 60vh;
-        --font-size-title: 14px;
-        --font-size-legend: 10px;
+        --font-size-title: 18px;
+        --font-size-legend: 12px;
         --font-size-axis: 8px;
         --padding-chart: 5px;
     }
-}
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    background-color: #121212;
-    color: #e0e0e0;
-}
-#chartContainer {
-    width: var(--chart-width);
-    height: var(--chart-height);
-    position: relative;
-}
-#marketCapChart {
-    width: 100% !important;
-    height: 100% !important;
-}
-#chartTitle {
-    font-size: var(--font-size-title);
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    text-align: center;
-}
-#chartLegend {
-    font-size: var(--font-size-legend);
-    position: absolute;
-    top: calc(var(--font-size-title) + 10px);
-    left: 0;
-    right: 0;
-    text-align: center;
-}
-#yAxisTitle, #xAxisTitle {
-    font-size: var(--font-size-axis);
-    position: absolute;
-}
-#yAxisTitle {
-    left: calc(-1 * var(--font-size-axis));
-    top: 50%;
-    transform: rotate(-90deg) translateX(-50%);
-    transform-origin: left top;
-}
-#xAxisTitle {
-    bottom: calc(-1 * var(--font-size-axis));
-    left: 50%;
-    transform: translateX(-50%);
-}
-#currentDate {
-    font-size: var(--font-size-legend);
-    position: absolute;
-    top: var(--padding-chart);
-    right: var(--padding-chart);
+    
+    #chartTitle {
+        font-size: var(--font-size-title);
+        padding: 10px 0;
+    }
+    
+    #chartLegend {
+        position: relative;
+        top: auto;
+        padding: 5px 0;
+    }
+    
+    #currentDate {
+        top: 5px;
+        left: 5px;
+        right: auto;
+        font-size: 14px;
+    }
+
+    #yAxisTitle, #xAxisTitle {
+        font-size: 10px;
+    }
+    
+    #chartContainer {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
 }
