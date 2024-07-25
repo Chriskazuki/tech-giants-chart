@@ -282,7 +282,7 @@ body {
 #chartLegend {
     font-size: 8 px;
     position: absolute;
-    top: calc(var(--font-size-title) + 80px);
+    top: calc(var(--font-size-title) + 95px);
     left: 0;
     right: 0;
     text-align: center;
@@ -312,6 +312,6 @@ body {
     font-size: var(--font-size-legend);
     position: absolute;
     top: -1%;
-    right: 10%;
+    right: 20%;
     right: var(--padding-chart);
 }
