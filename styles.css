@@ -294,8 +294,9 @@ body {
 }
 
 #yAxisTitle {
-    left: calc(-1 * var(--font-size-axis));
-    top: 50%;
+    left: calc(-1* var(--font-size-axis));
+    top: -2%;
+    left: 3%;
     transform: rotate(-45eg) translateX(-50%);
     transform-origin: left top;
 }
