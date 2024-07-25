@@ -115,7 +115,7 @@ body {
     color: #ffffff;
     position: relative;
     top: 80px;
-    right: 20px;
+    right: 20%;
     z-index: 1001;
     padding: 10px 15px;
     border-radius: 5px;
@@ -313,5 +313,4 @@ body {
     position: absolute;
     top: -1%;
     right: 20%;
-    right: var(--padding-chart);
 }
