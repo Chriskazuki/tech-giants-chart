@@ -211,7 +211,10 @@ body {
     cursor: not-allowed;
 }
 
-@media only screen and (max-width: 428px) {
+@media only screen 
+        and (device-width: 428px) 
+        and (device-height: 926px) 
+        and (-webkit-device-pixel-ratio: 3) { 
     :root {
         --font-size-title: 18px;
         --font-size-legend: 12px;
