@@ -22,7 +22,7 @@
     --font-size-title: 28px;
     --font-size-legend: 18px;
     --font-size-axis: 14px;
-    --padding-chart: 16px;
+    --padding-chart: 12px;
 }
 
 body {
@@ -55,7 +55,7 @@ body {
 #yAxisTitle {
     left: 15px;
     top: -30px;
-    transform: none;
+    transform: translateX(-50%);
 }
 
 #xAxisTitle {
@@ -97,7 +97,7 @@ body {
 
 #chartLegend {
     font-family: 'Neue Haas Display', Helvetica, Arial, sans-serif;
-    width: 100%;
+    width: 70%;
     text-align: center;
     padding: 10px 0;
     background-color: rgba(18, 18, 18, 0.8);
@@ -123,8 +123,8 @@ body {
 }
 
 #chartContainer {
-    width: 100vw;
-    height: calc(100vh - 110px);
+    width: 90vw;
+    height: calc(80vh - 110px);
     position: relative;
     margin-top: 110px;
     padding-bottom: 60px;
