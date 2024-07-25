@@ -113,8 +113,8 @@ body {
     font-size: 24px;
     font-weight: 900;
     color: #ffffff;
-    position: fixed;
-    top: 20px;
+    position: relative;
+    top: 80px;
     right: 20px;
     z-index: 1001;
     padding: 10px 15px;
