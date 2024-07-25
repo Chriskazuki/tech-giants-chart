@@ -22,7 +22,6 @@
     --font-size-title: 32px;
     --font-size-legend: 16px;
     --font-size-axis: 16px;
-    --padding-chart: 20px;
 }
 
 body {
@@ -245,7 +244,6 @@ body {
         --font-size-title: 16px;
         --font-size-legend: 10px;
         --font-size-axis: 8px;
-        --padding-chart: 5px;
     }
 }
 
