@@ -309,6 +309,6 @@ body {
 #currentDate {
     font-size: var(--font-size-legend);
     position: absolute;
-    top: var(--padding-chart);
+    top: 30%;
     right: var(--padding-chart);
 }
