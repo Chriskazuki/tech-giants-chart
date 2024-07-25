@@ -280,9 +280,9 @@ body {
 }
 
 #chartLegend {
-    font-size: var(--font-size-legend);
+    font-size: 8 px;
     position: absolute;
-    top: calc(var(--font-size-title) + 10px);
+    top: calc(var(--font-size-title) + 30px);
     left: 0;
     right: 0;
     text-align: center;
@@ -296,13 +296,14 @@ body {
 #yAxisTitle {
     left: calc(-1 * var(--font-size-axis));
     top: 50%;
-    transform: rotate(-90deg) translateX(-50%);
+    transform: rotate(-45eg) translateX(-50%);
     transform-origin: left top;
 }
 
 #xAxisTitle {
     bottom: calc(-1 * var(--font-size-axis));
     left: 50%;
+    bottom : 20% ;
     transform: translateX(-50%);
 }
 
