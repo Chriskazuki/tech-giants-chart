@@ -261,6 +261,7 @@ body {
     width: var(--chart-width);
     height: var(--chart-height);
     position: relative;
+    margin-top: 160px;
 }
 
 #marketCapChart {
