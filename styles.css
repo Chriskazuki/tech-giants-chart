@@ -283,7 +283,7 @@ body {
 #chartLegend {
     font-size: 8 px;
     position: absolute;
-    top: calc(var(--font-size-title) + 30px);
+    top: calc(var(--font-size-title) + 60px);
     left: 0;
     right: 0;
     text-align: center;
@@ -304,7 +304,7 @@ body {
 #xAxisTitle {
     bottom: calc(-1 * var(--font-size-axis));
     left: 50%;
-    bottom : 20% ;
+    bottom : 0.3%;
     transform: translateX(-50%);
 }
 
