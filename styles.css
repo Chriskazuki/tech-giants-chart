@@ -52,9 +52,9 @@ body {
 }
 
 #yAxisTitle {
-    left: 15px;
-    top: 10px;
-    transform: none;
+    left: -9%;
+    top: 30%;
+    transform: rotate(90deg);
 }
 
 #xAxisTitle {
@@ -150,11 +150,11 @@ body {
 #finalRankingContainer {
     display: none;
     position: absolute;
-    top: 140px;
+    top: 200px;
     left: 100px;
-    width: 250px;
+    width: 100px;
     background-color: rgba(18, 18, 18, 0.9);
-    padding: 30px;
+    padding: 80px;
     border-radius: 10px;
     z-index: 1000;
     font-family: 'Neue Haas Display', Helvetica, Arial, sans-serif;
@@ -241,9 +241,9 @@ body {
     :root {
         --chart-width: 70vw;
         --chart-height: 70vh;
-        --font-size-title: 16px;
-        --font-size-legend: 10px;
-        --font-size-axis: 8px;
+        --font-size-title: 30px;
+        --font-size-legend: 24px;
+        --font-size-axis: 24px;
     }
 }
 
@@ -262,6 +262,7 @@ body {
     height: var(--chart-height);
     position: relative;
     margin-top: 160px;
+    margin-left : 5% 
 }
 
 #marketCapChart {
@@ -281,7 +282,7 @@ body {
 #chartLegend {
     font-size: 8 px;
     position: absolute;
-    top: calc(var(--font-size-title) + 60px);
+    top: calc(var(--font-size-title) + 30px);
     left: 0;
     right: 0;
     text-align: center;
@@ -296,8 +297,7 @@ body {
     left: calc(-1* var(--font-size-axis));
     top: -2%;
     left: 4%;
-    transform: rotate(-45eg) translateX(-50%);
-    transform-origin: left top;
+    transform: rotate(90deg);
 }
 
 #xAxisTitle {
@@ -310,6 +310,6 @@ body {
 #currentDate {
     font-size: var(--font-size-legend);
     position: absolute;
-    top: -1%;
-    right: 20%;
+    top: -3.5%;
+    right: 4%;
 }
