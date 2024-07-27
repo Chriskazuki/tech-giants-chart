@@ -214,10 +214,12 @@ body {
     cursor: pointer;
     transition: background-color 0.3s;
     margin: 0 10px;
+    display: none;
 }
 
 #animateButton {
     background-color: #4CAF50;
+    display : none;
 }
 
 #downloadVideoButton {
