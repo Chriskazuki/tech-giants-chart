@@ -245,71 +245,55 @@
                 }
             }
         },
-                plugins: [{
-    id: 'customAnimation',
-    afterDraw: (chart) => {
-        if (currentDataIndex < Math.max(...Object.values(data).map(d => d.length)) - 1) {
-            currentDataIndex++;
-            companies.forEach((company, index) => {
-                const currentData = data[company.name][Math.min(currentDataIndex, data[company.name].length - 1)];
-                chart.data.datasets[index].data = data[company.name].slice(0, currentDataIndex + 1);
-                
-                const annotation = chart.options.plugins.annotation.annotations[`${company.name}Value`];
-                annotation.content = `${company.name}: $${currentData.y.toFixed(2)}B`;
-                annotation.xValue = currentData.x;
-                annotation.yValue = currentData.y;
+                          plugins: [{
+                    id: 'customAnimation',
+                    afterDraw: (chart) => {
+                        if (currentDataIndex < Math.max(...Object.values(data).map(d => d.length)) - 1) {
+                            currentDataIndex++;
+                            companies.forEach((company, index) => {
+                                const currentData = data[company.name][Math.min(currentDataIndex, data[company.name].length - 1)];
+                                chart.data.datasets[index].data = data[company.name].slice(0, currentDataIndex + 1);
 
-                // Nouvelle logique pour ajuster la position des étiquettes
-                const xScale = chart.scales.x;
-                const chartArea = chart.chartArea;
-                const xPixel = xScale.getPixelForValue(currentData.x);
-                const labelWidth = chart.ctx.measureText(annotation.content).width + 12; // 12 pour le padding
+                                chart.options.plugins.annotation.annotations[${company.name}Value].content = ${company.name}: $${currentData.y.toFixed(2)}B;
+                                chart.options.plugins.annotation.annotations[${company.name}Value].xValue = currentData.x;
+                                chart.options.plugins.annotation.annotations[${company.name}Value].yValue = currentData.y;
+                            });
 
-                if (xPixel + labelWidth > chartArea.right) {
-                    const overflow = xPixel + labelWidth - chartArea.right;
-                    annotation.xAdjust = -overflow - 10; // 10 pixels de marge supplémentaire
-                    annotation.xAlign = 'right';
-                } else {
-                    annotation.xAdjust = 0;
-                    annotation.xAlign = 'left';
-                }
-            });
-            
-            const visibleData = chart.data.datasets.flatMap(dataset => dataset.data);
-            const maxValue = Math.max(...visibleData.map(d => d.y));
-            chart.options.scales.y.max = maxValue * 1.1;
+                            const visibleData = chart.data.datasets.flatMap(dataset => dataset.data);
+                            const maxValue = Math.max(...visibleData.map(d => d.y));
+                            chart.options.scales.y.max = maxValue * 1.1;
+                            const currentDate = new Date(Math.max(...companies.map(company => 
+                                data[company.name][Math.min(currentDataIndex, data[company.name].length - 1)].x
+                            )));
+                            chart.options.scales.x.max = moment(currentDate).add(1, 'years').toDate();
+                            document.getElementById('currentDate').textContent = moment(currentDate).format('MMMM D, YYYY');
 
-            const currentDate = new Date(Math.max(...companies.map(company => 
-                data[company.name][Math.min(currentDataIndex, data[company.name].length - 1)].x
-            )));
-            chart.options.scales.x.max = moment(currentDate).add(1, 'years').toDate();
-            document.getElementById('currentDate').textContent = moment(currentDate).format('MMMM D, YYYY');
-            
-            chart.update('none');
+                            chart.update('none');
+                            if (window.currentTime !== undefined) {
+                                window.currentTime += delayBetweenPoints;
+                                requestAnimationFrame(() => chart.draw());
+                            }
+                        } else {
+                            const finalValues = companies.map(company => ({
+                                name: company.name,
+                                logo: company.logo,
+                                value: data[company.name][data[company.name].length - 1].y
+                            }));
+                            finalValues.sort((a, b) => b.value - a.value);
+                            const rankingHtml = finalValues.map((company, index) => 
+                                <div class="rank-item">
+                                    <span class="rank">${index + 1}</span>
+                                    <img src="${company.logo}" alt="${company.name}" class="company-logo">
+                                    <span class="value">$${company.value.toFixed(2)}B</span>
+                                 </div>
+                            ).join('');
+                            document.getElementById('finalRanking').innerHTML = rankingHtml;
+                            document.getElementById('finalRankingContainer').style.display = 'block';
+                        }
+                    }
+                }]
+            };
 
-            if (window.currentTime !== undefined) {
-                window.currentTime += delayBetweenPoints;
-                requestAnimationFrame(() => chart.draw());
-            }
-        } else {
-            const finalValues = companies.map(company => ({
-                name: company.name,
-                logo: company.logo,
-                value: data[company.name][data[company.name].length - 1].y
-            }));
-            finalValues.sort((a, b) => b.value - a.value);
-            const rankingHtml = finalValues.map((company, index) => 
-                `<div class="rank-item">
-                    <span class="rank">${index + 1}</span>
-                    <img src="${company.logo}" alt="${company.name}" class="company-logo">
-                    <span class="value">$${company.value.toFixed(2)}B</span>
-                 </div>`
-            ).join('');
-            document.getElementById('finalRanking').innerHTML = rankingHtml;
-            document.getElementById('finalRankingContainer').style.display = 'block';
-        }
-    }
-}]
             window.chart = new Chart(ctx, chartConfig);
             createCustomLegend(window.chart);
 
