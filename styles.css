@@ -151,11 +151,11 @@ body {
 #finalRankingContainer {
     display: none;
     position: absolute;
-    top: 200px;
-    left: 100px;
-    width: 100px;
+    top: 15%;
+    left: 22%;
+    width: 10px;
     background-color: rgba(18, 18, 18, 0.9);
-    padding: 80px;
+    padding: 10px;
     border-radius: 10px;
     z-index: 1000;
     font-family: 'Neue Haas Display', Helvetica, Arial, sans-serif;
