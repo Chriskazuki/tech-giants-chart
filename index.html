@@ -229,17 +229,17 @@
                             borderRadius: isMobile ? 2 : 4,
                             xAdjust: isMobile ? 50 : 100,
                             yAdjust: 0,
-                            xAdjust: 150,
+                            xAdjust: 20,
                             textAlign: 'left',
                             xAlign: 'left', // Changé à 'left' pour plus de flexibilité
                             yAlign: 'center',
                             // Ajout d'une ligne de connexion entre le point et le label
                             callout: {
                                 display: true,
-                                borderColor: company.color,
+                                borderColor: this.getTransparentColor(company.color, 0.5), // Rend la ligne plus transparente
                                 borderWidth: 2,
                                 side: 'left',
-                                length: 20
+                                length: 3
                             }
 
                         }
@@ -351,6 +351,17 @@
     if (window.currentTime !== undefined) {
         requestAnimationFrame(() => window.chart.draw());
     }
+}
+
+        // Ajoutez cette fonction auxiliaire en dehors de la configuration des annotations
+getTransparentColor: function(color, opacity) {
+    // Si la couleur est déjà au format rgba, on ajuste simplement l'opacité
+    if (color.startsWith('rgba')) {
+        return color.replace(/[\d\.]+\)$/g, `${opacity})`);
+    }
+    // Sinon, on convertit la couleur en rgba
+    const rgb = color.match(/\d+/g);
+    return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${opacity})`;
 }
         // À la fin de votre script, après toutes les définitions de fonctions :
         console.log("Script started");
