@@ -271,7 +271,7 @@
                             const oldestDate = new Date(Math.min(...visibleData.map(d => d.x)));
                             const range = currentDate - oldestDate;
                             chart.options.scales.x.min = oldestDate;
-                            chart.options.scales.x.max = new Date(currentDate.getTime() + range * 0.18); // Ajoute 10% de la plage visible
+                            chart.options.scales.x.max = new Date(currentDate.getTime() + range * 0.40); // Ajoute 10% de la plage visible
 
                             document.getElementById('currentDate').textContent = moment(currentDate).format('MMMM D, YYYY');
 
