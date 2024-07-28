@@ -236,7 +236,7 @@
                             // Ajout d'une ligne de connexion entre le point et le label
                             callout: {
                                 display: true,
-                                borderColor: this.getTransparentColor(company.color, 0.5), // Rend la ligne plus transparente
+                                borderColor: getTransparentColor(company.color, 0.5), // Rend la ligne plus transparente
                                 borderWidth: 2,
                                 side: 'left',
                                 length: 3
@@ -315,6 +315,17 @@
             }, 100);
             return window.chart;
         }
+// Définissez cette fonction en dehors de toute autre fonction ou configuration
+function getTransparentColor(color, opacity) {
+    // Si la couleur est déjà au format rgba, on ajuste simplement l'opacité
+    if (color.startsWith('rgba')) {
+        return color.replace(/[\d\.]+\)$/g, `${opacity})`);
+    }
+    // Sinon, on convertit la couleur en rgba
+    const rgb = color.match(/\d+/g);
+    return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${opacity})`;
+}
+        
         function createCustomLegend(chart) {
             const legendContainer = document.getElementById('chartLegend');
             legendContainer.innerHTML = chart.data.datasets.map(dataset => 
@@ -351,17 +362,6 @@
     if (window.currentTime !== undefined) {
         requestAnimationFrame(() => window.chart.draw());
     }
-}
-
-        // Ajoutez cette fonction auxiliaire en dehors de la configuration des annotations
-getTransparentColor: function(color, opacity) {
-    // Si la couleur est déjà au format rgba, on ajuste simplement l'opacité
-    if (color.startsWith('rgba')) {
-        return color.replace(/[\d\.]+\)$/g, `${opacity})`);
-    }
-    // Sinon, on convertit la couleur en rgba
-    const rgb = color.match(/\d+/g);
-    return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${opacity})`;
 }
         // À la fin de votre script, après toutes les définitions de fonctions :
         console.log("Script started");
