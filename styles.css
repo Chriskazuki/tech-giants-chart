@@ -109,7 +109,6 @@ body {
     position: relative;
     margin-top: 160px;
     padding-bottom: 60px;
-    overflow: visible;
 }
 
 #marketCapChart {
@@ -119,7 +118,6 @@ body {
     top: 0;
     left: 0;
     background-color: transparent !important;
-    overflow: visible;
 }
 
 .chartjs-tooltip {
@@ -248,14 +246,12 @@ body {
     height: var(--chart-height);
     position: relative;
     margin-top: 160px;
-    margin-left : 5%;
-    overflow: visible;
+    margin-left : 5% 
 }
 
 #marketCapChart {
     width: 100% !important;
     height: 100% !important;
-    overflow: visible;
 }
 
 #chartTitle {
