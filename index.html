@@ -101,7 +101,7 @@
         
         const isMobile = window.innerWidth <= 428;
         
-        const totalDuration = isMobile ? 2000 : 1000;
+        const totalDuration = isMobile ? 20000 : 15000;
         const maxDataPoints = Math.max(...Object.values(data).map(d => d.length));
         console.log("Max data points:", maxDataPoints);
         const delayBetweenPoints = Math.max(20, totalDuration / maxDataPoints);
