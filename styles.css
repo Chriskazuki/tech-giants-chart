@@ -18,7 +18,7 @@
 }
 
 :root {
-    --chart-width: 100%;
+    --chart-width: 110%;
     --chart-height: 100vh;
     --font-size-title: 32px;
     --font-size-legend: 16px;
