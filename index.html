@@ -260,7 +260,11 @@
                             const currentDate = new Date(Math.max(...companies.map(company => 
                                 data[company.name][Math.min(currentDataIndex, data[company.name].length - 1)].x
                             )));
-                            chart.options.scales.x.max = moment(currentDate).add(1, 'years').toDate();
+                             // Mise à jour dynamique de l'axe des x
+                            const oldestDate = new Date(Math.min(...visibleData.map(d => d.x)));
+                            const range = currentDate - oldestDate;
+                            chart.options.scales.x.min = oldestDate;
+                            chart.options.scales.x.max = new Date(currentDate.getTime() + range * 0.1); // Ajoute 10% de la plage visible
 
                             document.getElementById('currentDate').textContent = moment(currentDate).format('MMMM D, YYYY');
 
