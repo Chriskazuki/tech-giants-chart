@@ -331,7 +331,7 @@
     });
     window.chart.options.scales.y.max = Math.max(...Object.values(data).map(d => d[0].y)) * 1.1;
     window.chart.options.scales.x.min = Object.values(data)[0][0].x;
-    window.chart.options.scales.x.max = moment(Object.values(data)[0][0].x).add(isMobile ? 3 : 5, 'years').toDate();
+    window.chart.options.scales.x.max = moment(Object.values(data)[0][0].x).add(isMobile ? 3 : 8, 'years').toDate();
     document.getElementById('currentDate').textContent = moment(Object.values(data)[0][0].x).format(isMobile ? 'MM/DD/YY' : 'MMM D, YYYY');
     document.getElementById('finalRankingContainer').style.display = 'none';
     window.chart.update();
