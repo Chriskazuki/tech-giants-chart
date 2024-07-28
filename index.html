@@ -229,18 +229,17 @@
                             borderRadius: isMobile ? 2 : 4,
                             xAdjust: isMobile ? 50 : 100,
                             yAdjust: 0,
-                            xAdjust: 50,
+                            xAdjust: -17,
                             textAlign: 'left',
                             xAlign: 'left', // Changé à 'left' pour plus de flexibilité
                             yAlign: 'center',
-                            // Ajout d'une ligne de connexion entre le point et le label
                             callout: {
-                                display: true,
-                                borderColor: getTransparentColor(company.color, 0.5), // Rend la ligne plus transparente
-                                borderWidth: 2,
-                                side: 'left',
-                                length: 25
-                            }
+                display: true,
+                borderColor: company.color,
+                borderWidth: 2,
+                side: 'left',
+                length: 20
+            }
 
                         }
                     ]))
@@ -315,17 +314,6 @@
             }, 100);
             return window.chart;
         }
-// Définissez cette fonction en dehors de toute autre fonction ou configuration
-function getTransparentColor(color, opacity) {
-    // Si la couleur est déjà au format rgba, on ajuste simplement l'opacité
-    if (color.startsWith('rgba')) {
-        return color.replace(/[\d\.]+\)$/g, `${opacity})`);
-    }
-    // Sinon, on convertit la couleur en rgba
-    const rgb = color.match(/\d+/g);
-    return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${opacity})`;
-}
-        
         function createCustomLegend(chart) {
             const legendContainer = document.getElementById('chartLegend');
             legendContainer.innerHTML = chart.data.datasets.map(dataset => 
