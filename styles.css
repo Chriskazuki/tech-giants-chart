@@ -152,7 +152,7 @@ body {
 }
 
 #marketCapChart {
-    width: 100% !important;
+    width: 120% !important;
     height: 100% !important;
     position: absolute;
     top: 0;
@@ -290,7 +290,7 @@ body {
 }
 
 #marketCapChart {
-    width: 100% !important;
+    width: 120% !important;
     height: 100% !important;
 }
 
