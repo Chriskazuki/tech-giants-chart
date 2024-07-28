@@ -32,7 +32,6 @@
         <div id="xAxisTitle">Year</div>
         <div id="currentDate"></div>
     </div>
-    <div id="chartLabels"></div> <!-- Nouveau conteneur pour les labels -->
     <div id="finalRankingContainer">
         <h2>Ranking</h2>
         <div id="finalRanking"></div>
@@ -156,9 +155,9 @@
             layout: {
                 padding: {
                     top: isMobile ? 10 : 20,
-                    right: isMobile ? 10 : -50,
+                    right: isMobile ? 10 : 40,
                     bottom: isMobile ? 60 : 20,
-                    left: isMobile ? 15 : 35
+                    left: isMobile ? 15 : 40
                 }
             },
             scales: {
@@ -214,7 +213,6 @@
                     enabled: !isMobile
                 },
                 annotation: {
-                     clip: false,
                     annotations: Object.fromEntries(companies.map(company => [
                         `${company.name}Value`,
                         {
@@ -224,12 +222,12 @@
                             content: isMobile ? company.name : `${company.name}: $${data[company.name][0].y.toFixed(2)}B`,
                             backgroundColor: company.color,
                             color: 'white',
-                            padding: isMobile ? 2 : 4,
+                            padding: isMobile ? 2 : 6,
                             font: {
                                 size: isMobile ? 8 : 12
                             },
                             borderRadius: isMobile ? 2 : 4,
-                            xAdjust: 0,
+                            xAdjust: isMobile ? 50 : 100,
                             yAdjust: 0,
                             textAlign: 'start',
                             xAlign: 'left', // Changé à 'left' pour plus de flexibilité
@@ -243,7 +241,6 @@
                 plugins: [{
                     id: 'customAnimation',
                     afterDraw: (chart) => {
-                        updateLabels(chart);
                         if (currentDataIndex < Math.max(...Object.values(data).map(d => d.length)) - 1) {
                             currentDataIndex++;
                             companies.forEach((company, index) => {
@@ -341,26 +338,6 @@
     if (window.currentTime !== undefined) {
         requestAnimationFrame(() => window.chart.draw());
     }
-}
-    function updateLabels(chart) {
-    const labelsContainer = document.getElementById('chartLabels');
-    labelsContainer.innerHTML = ''; // Clear existing labels
-
-    chart.data.datasets.forEach((dataset, index) => {
-        const lastDataPoint = dataset.data[dataset.data.length - 1];
-        if (lastDataPoint) {
-            const xPos = chart.scales.x.getPixelForValue(lastDataPoint.x);
-            const yPos = chart.scales.y.getPixelForValue(lastDataPoint.y);
-
-            const label = document.createElement('div');
-            label.className = 'chart-label';
-            label.textContent = `${dataset.label}: $${lastDataPoint.y.toFixed(2)}B`;
-            label.style.left = `${xPos + chart.chartArea.left}px`;
-            label.style.top = `${yPos + chart.chartArea.top}px`;
-
-            labelsContainer.appendChild(label);
-        }
-    });
 }
         // À la fin de votre script, après toutes les définitions de fonctions :
         console.log("Script started");
