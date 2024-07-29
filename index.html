@@ -102,10 +102,10 @@
         
         const isMobile = window.innerWidth <= 428;
         
-        const totalDuration = isMobile ? 20000 : 15000;
+        const totalDuration = isMobile ? 20000 : 7500;
         const maxDataPoints = Math.max(...Object.values(data).map(d => d.length));
         console.log("Max data points:", maxDataPoints);
-        const delayBetweenPoints = Math.max(20, totalDuration / maxDataPoints);
+        const delayBetweenPoints = Math.max(10, totalDuration / maxDataPoints);
         let currentDataIndex = 0;
             const animation = {
                 x: {
