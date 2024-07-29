@@ -1,9 +1,9 @@
 :root {
-    --chart-width: 100%;
-    --chart-height: 100vh;
-    --font-size-title: 32px;
-    --font-size-legend: 16px;
-    --font-size-axis: 16px;
+        --chart-width: 390px;
+        --chart-height: 390px;
+        --font-size-title: 30px;
+        --font-size-legend: 24px;
+        --font-size-axis: 24px;
 }
 
 body {
@@ -223,7 +223,7 @@ body {
     cursor: not-allowed;
 }
 
-@media only screen and (max-width: 428px) {
+@media only screen and (hover: none) and (pointer: coarse) {
     :root {
         --chart-width: 390px;
         --chart-height: 390px;
