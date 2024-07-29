@@ -101,8 +101,10 @@
         
         const isMobile = window.innerWidth <= 428;
         
-        const totalDuration = isMobile ? 20000 : 30000;
-        const delayBetweenPoints = totalDuration / Math.max(...Object.values(data).map(d => d.length));
+        const totalDuration = isMobile ? 20000 : 15000;
+        const maxDataPoints = Math.max(...Object.values(data).map(d => d.length));
+        console.log("Max data points:", maxDataPoints);
+        const delayBetweenPoints = Math.max(20, totalDuration / maxDataPoints);
         let currentDataIndex = 0;
             const animation = {
                 x: {
@@ -229,10 +231,17 @@
                             borderRadius: isMobile ? 2 : 4,
                             xAdjust: isMobile ? 50 : 100,
                             yAdjust: 0,
-                            xAdjust: -17,
-                            textAlign: 'end',
-                            xAlign: 'right', // Changé à 'left' pour plus de flexibilité
-                            yAlign: 'right'
+                            xAdjust: 50,
+                            textAlign: 'left',
+                            xAlign: 'left', // Changé à 'left' pour plus de flexibilité
+                            yAlign: 'center',
+                            callout: {
+                display: true,
+                borderColor: company.color,
+                borderWidth: 2,
+                side: 'left',
+                length: 3
+            }
 
                         }
                     ]))
@@ -264,7 +273,7 @@
                             const oldestDate = new Date(Math.min(...visibleData.map(d => d.x)));
                             const range = currentDate - oldestDate;
                             chart.options.scales.x.min = oldestDate;
-                            chart.options.scales.x.max = new Date(currentDate.getTime() + range * 0.18); // Ajoute 10% de la plage visible
+                            chart.options.scales.x.max = new Date(currentDate.getTime() + range * 0.70); // Ajoute 10% de la plage visible
 
                             document.getElementById('currentDate').textContent = moment(currentDate).format('MMMM D, YYYY');
 
