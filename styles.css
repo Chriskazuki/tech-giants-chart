@@ -1,9 +1,9 @@
 :root {
-        --chart-width: 428px;
-        --chart-height: 428px;
-        --font-size-title: 30px;
-        --font-size-legend: 24px;
-        --font-size-axis: 24px;
+    --chart-width: 100%;
+    --chart-height: 100vh;
+    --font-size-title: 32px;
+    --font-size-legend: 16px;
+    --font-size-axis: 16px;
 }
 
 body {
@@ -13,8 +13,6 @@ body {
     margin: 0;
     padding: 0;
     display: flex;
-    width: 428px;
-    height: 428px;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
@@ -106,16 +104,16 @@ body {
 }
 
 #chartContainer {
-    width: 428px;
-    height: 428px;
+    width: 100vw;
+    height: calc(100vh - 110px);
     position: relative;
     margin-top: 160px;
     padding-bottom: 60px;
 }
 
 #marketCapChart {
-    width: 428px;
-    height: 428px;
+    width: 100% !important;
+    height: 100% !important;
     position: absolute;
     top: 0;
     left: 0;
@@ -223,10 +221,10 @@ body {
     cursor: not-allowed;
 }
 
-@media only screen and (hover: none) and (pointer: coarse) {
+@media only screen and (max-width: 428px) {
     :root {
-        --chart-width: 428px;
-        --chart-height: 428px;
+        --chart-width: 70vw;
+        --chart-height: 70vh;
         --font-size-title: 30px;
         --font-size-legend: 24px;
         --font-size-axis: 24px;
@@ -237,8 +235,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 428px;
-    height: 428px;
+    height: 100vh;
     margin: 0;
     background-color: #121212;
     color: #e0e0e0;
