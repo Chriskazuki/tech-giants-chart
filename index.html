@@ -86,6 +86,7 @@
     };
         // Ajoutez ce code juste après la définition de window.renderD3Video
         console.log("renderD3Video is defined:", typeof window.renderD3Video === "function");
+        let data; // Declare data in a wider scope
         async function loadData() {
             const dataPromises = companies.map(company => 
                 fetch(company.file).then(response => response.json())
@@ -105,7 +106,7 @@
             ]));
         }
         async function createChart() {
-        const data = await loadData();
+        data = await loadData();
         const ctx = document.getElementById('marketCapChart').getContext('2d');
         
         const isMobile = window.innerWidth <= 428;
@@ -350,7 +351,7 @@ setTimeout(() => {
 }
         // À la fin de votre script, après toutes les définitions de fonctions :
         console.log("Script started");
-        let data; // Declare data in a wider scope
+        
         async function initializeChart() {
             console.log("initializeChart started");
             data = await loadData();
