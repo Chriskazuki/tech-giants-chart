@@ -262,7 +262,7 @@ body {
 #chartLegend {
     font-size: 8 px;
     position: absolute;
-    top: calc(var(--font-size-title) - 120px);
+    top: calc(var(--font-size-title) - 110px);
     left: 0;
     right: 0;
     text-align: center;
