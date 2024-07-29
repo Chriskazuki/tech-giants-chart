@@ -257,7 +257,7 @@ body {
 #chartTitle {
     font-size: var(--font-size-title);
     position: absolute;
-    top: 0;
+    top: -180px;
     left: 0;
     right: 0;
     text-align: center;
@@ -266,7 +266,7 @@ body {
 #chartLegend {
     font-size: 8 px;
     position: absolute;
-    top: calc(var(--font-size-title) + 60px);
+    top: calc(var(--font-size-title) + 110px);
     left: 0;
     right: 0;
     text-align: center;
