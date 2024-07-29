@@ -66,6 +66,7 @@ body {
     font-weight: 900;
     text-align: center;
     color: #ffffff;
+    top: -180px;
     width: 100%;
     padding: 20px 0 10px;
     background-color: rgba(18, 18, 18, 0.8);
@@ -83,7 +84,6 @@ body {
     padding: 10px 0;
     background-color: rgba(18, 18, 18, 0.8);
     position: fixed;
-    top: 70px;
     left: 0;
     z-index: 1000;
     color: #ffffff;
