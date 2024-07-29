@@ -83,16 +83,17 @@
                 fetch(company.file).then(response => response.json())
             );
             const allData = await Promise.all(dataPromises);
-            const processData = (data) => data.map(item => ({
-                x: new Date(item.x),
-                y: item.y / 1e9  // Convert to billions
-            }));
+            const processData = (data) => data
+                .filter(item => new Date(item.x).getFullYear() >= 2014) // Filtre les données à partir de 2014
+                .map(item => ({
+                    x: new Date(item.x),
+                    y: item.y / 1e9  // Convert to billions
+                }));
             const processedData = allData.map(processData);
-            const startDate = new Date(Math.max(...processedData.map(data => data[0].x.getTime())));
-            const filterFromStartDate = (data) => data.filter(item => item.x >= startDate);
+            const startDate = new Date(Math.min(...processedData.flatMap(data => data.map(item => item.x.getTime()))));
             return Object.fromEntries(companies.map((company, index) => [
                 company.name,
-                filterFromStartDate(processedData[index])
+                processedData[index]
             ]));
         }
         async function createChart() {
@@ -158,7 +159,7 @@
                 padding: {
                     top: isMobile ? 10 : 20,
                     right: isMobile ? 10 : 40,
-                    bottom: isMobile ? 60 : 20,
+                    bottom: isMobile ? 60 : 10,
                     left: isMobile ? 15 : 40
                 }
             },
