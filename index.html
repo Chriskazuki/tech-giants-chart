@@ -24,7 +24,6 @@
     </script>
 </head>
 <body>
-    <input type="range" id="speedControl" min="0.5" max="2" step="0.1" value="1">
     <div id="chartContainer">
         <h1 id="chartTitle">THE $2 TRILLION MARKET CAP CLUB</h1>
         <div id="chartLegend"></div>
@@ -46,13 +45,6 @@
             { name: 'Microsoft', file: 'msft_market_cap.json', color: 'rgba(54, 162, 235, 1)', logo: 'Microsoft_logo.svg' },
             { name: 'NVIDIA', file: 'nvidia_market_cap.json', color: 'rgba(153, 102, 255, 1)', logo: 'Nvidia_logo.svg' }
         ];
-        // Ajoutez ce JavaScript
-        const speedControl = document.getElementById('speedControl');
-        let animationSpeed = 1;
-        speedControl.addEventListener('input', (e) => {
-    animationSpeed = parseFloat(e.target.value);
-});
-     let data; // Declare data in a wider scope
         window.renderD3Video = function({ width, height }) {
         console.log("renderD3Video called with width:", width, "height:", height);
         return new Promise(resolve => {
@@ -142,7 +134,7 @@
                         return ctx.index * delayBetweenPoints;
                     }
                 }
-            }};
+            };
             const chartConfig = {
         type: 'line',
         data: {
@@ -283,31 +275,44 @@
 
                             chart.update('none');
 
-setTimeout(() => {
-                requestAnimationFrame(() => chart.draw());
-            }, delayBetweenPoints / animationSpeed);
-        } else {
-            // Le code pour afficher le classement final reste inchangé
-            const finalValues = companies.map(company => ({
-                name: company.name,
-                logo: company.logo,
-                value: data[company.name][data[company.name].length - 1].y
-            }));
-            finalValues.sort((a, b) => b.value - a.value);
-            const rankingHtml = finalValues.map((company, index) => 
-                `<div class="rank-item">
-                    <span class="rank">${index + 1}</span>
-                    <img src="${company.logo}" alt="${company.name}" class="company-logo">
-                    <span class="value">$${company.value.toFixed(2)}B</span>
-                 </div>`
-            ).join('');
-            document.getElementById('finalRanking').innerHTML = rankingHtml;
-            document.getElementById('finalRankingContainer').style.display = 'block';
+                            if (window.currentTime !== undefined) {
+                                window.currentTime += delayBetweenPoints;
+                                requestAnimationFrame(() => chart.draw());
+                            }
+                        } else {
+                            const finalValues = companies.map(company => ({
+                                name: company.name,
+                                logo: company.logo,
+                                value: data[company.name][data[company.name].length - 1].y
+                            }));
+                            finalValues.sort((a, b) => b.value - a.value);
+                            const rankingHtml = finalValues.map((company, index) => 
+                                `<div class="rank-item">
+                                    <span class="rank">${index + 1}</span>
+                                    <img src="${company.logo}" alt="${company.name}" class="company-logo">
+                                    <span class="value">$${company.value.toFixed(2)}B</span>
+                                 </div>`
+                            ).join('');
+                            document.getElementById('finalRanking').innerHTML = rankingHtml;
+                            document.getElementById('finalRankingContainer').style.display = 'block';
+                        }
+                    }
+                }]
+            };
+
+            window.chart = new Chart(ctx, chartConfig);
+            createCustomLegend(window.chart);
+
+            setTimeout(() => {
+                if (window.currentTime !== undefined) {
+                    window.renderD3Video({ width: 1920, height: 1080 }).then(() => {
+                        startAnimation();
+                    });
+                }
+            }, 100);
+            return window.chart;
         }
-    }
-}]
-};
-function createCustomLegend(chart) {
+        function createCustomLegend(chart) {
             const legendContainer = document.getElementById('chartLegend');
             legendContainer.innerHTML = chart.data.datasets.map(dataset => 
                 `<span style="display:inline-block; margin-right:10px; font-family: 'Neue Haas Display', Helvetica, Arial, sans-serif; color: #ffffff;">
@@ -346,6 +351,7 @@ function createCustomLegend(chart) {
 }
         // À la fin de votre script, après toutes les définitions de fonctions :
         console.log("Script started");
+        let data; // Declare data in a wider scope
         async function initializeChart() {
             console.log("initializeChart started");
             data = await loadData();
