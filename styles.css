@@ -1,6 +1,6 @@
 :root {
-    --chart-width: 100%;
-    --chart-height: 100vh;
+    --chart-width: 90%;
+    --chart-height: 80vh;
     --font-size-title: 32px;
     --font-size-legend: 16px;
     --font-size-axis: 16px;
@@ -13,67 +13,33 @@ body {
     margin: 0;
     padding: 0;
     display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+#mainChartContainer {
+    width: var(--chart-width);
+    height: 90vh;
+    display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
-    min-height: 100vh;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    overflow: hidden;
-}
-
-#yAxisTitle,
-#xAxisTitle {
-    font-family: 'Neue Haas Display Black', Helvetica, Arial, sans-serif;
-    font-size: 16px;
-    font-weight: 900;
-    color: #ffffff;
-    position: absolute;
-    z-index: 1000;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-}
-
-#yAxisTitle {
-    left: -28%;
-    top: 30%;
-    transform: rotate(90deg);
-}
-
-#xAxisTitle {
-    font-family: 'Neue Haas Display Black', Helvetica, Arial, sans-serif;
-    font-size: 16px;
-    font-weight: 900;
-    color: #ffffff;
-    position: absolute;
-    bottom: 100px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding-bottom: 2px;
-    z-index: 1000;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-}
-
-.media-ui-HedAndDek_wrapper {
-    font-family: 'Neue Haas Display', 'Inter', Helvetica, Arial, sans-serif;
-    color: rgba(255, 255, 255, var(--tw-text-opacity));
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    position: relative;
 }
 
 #chartTitle {
     font-family: 'Neue Haas Display Black', Helvetica, Arial, sans-serif;
-    font-size: 10px;
+    font-size: var(--font-size-title);
     font-weight: 900;
     text-align: center;
     color: #ffffff;
     width: 100%;
     padding: 20px 0 10px;
-    background-color: rgba(18, 18, 18, 0.8);
     margin: 0;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1000;
+    background-color: rgba(18, 18, 18, 0.8);
 }
 
 #chartLegend {
@@ -82,10 +48,6 @@ body {
     text-align: center;
     padding: 10px 0;
     background-color: rgba(18, 18, 18, 0.8);
-    position: fixed;
-    top: 70px;
-    left: 0;
-    z-index: 1000;
     color: #ffffff;
 }
 
@@ -94,47 +56,54 @@ body {
     font-size: 24px;
     font-weight: 900;
     color: #ffffff;
-    position: relative;
-    top: 80px;
-    right: 20%;
-    z-index: 1001;
+    align-self: flex-end;
+    margin-right: 5%;
+    margin-bottom: 10px;
     padding: 10px 15px;
     border-radius: 5px;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
-#chartContainer {
-    width: 100vw;
-    height: calc(100vh - 110px);
+#chartWrapper {
+    width: 100%;
+    height: var(--chart-height);
     position: relative;
-    margin-top: 160px;
-    padding-bottom: 60px;
+}
+
+#yAxisTitle, #xAxisTitle {
+    font-family: 'Neue Haas Display Black', Helvetica, Arial, sans-serif;
+    font-size: var(--font-size-axis);
+    font-weight: 900;
+    color: #ffffff;
+    position: absolute;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+#yAxisTitle {
+    left: -5%;
+    top: 50%;
+    transform: rotate(-90deg) translateX(-50%);
+    transform-origin: left top;
+}
+
+#xAxisTitle {
+    bottom: -40px;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 #marketCapChart {
     width: 100% !important;
     height: 100% !important;
-    position: absolute;
-    top: 0;
-    left: 0;
     background-color: transparent !important;
-}
-
-.chartjs-tooltip {
-    background-color: rgba(30, 30, 30, 0.8) !important;
-    color: #e0e0e0 !important;
-}
-
-.chartjs-tooltip-key {
-    border-color: #e0e0e0 !important;
 }
 
 #finalRankingContainer {
     display: none;
     position: absolute;
     top: 15%;
-    left: 22%;
-    width: 10px;
+    right: 5%;
+    width: 200px;
     background-color: rgba(18, 18, 18, 0.9);
     padding: 10px;
     border-radius: 10px;
@@ -175,125 +144,97 @@ body {
     font-weight: bold;
 }
 
-#buttonContainer {
-    display: flex;
-    justify-content: center;
-    position: fixed;
-    bottom: 20px;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-}
-
-#animateButton,
-#downloadVideoButton {
+#animateButton {
     padding: 10px 20px;
     font-size: 16px;
     color: white;
+    background-color: #4CAF50;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s;
-    margin: 0 10px;
-    display: none;
-}
-
-#animateButton {
-    background-color: #4CAF50;
-    display : none;
-}
-
-#downloadVideoButton {
-    background-color: #008CBA;
-    display: none;
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 #animateButton:hover {
     background-color: #45a049;
 }
 
-#downloadVideoButton:hover {
-    background-color: #007B9A;
+.chartjs-tooltip {
+    background-color: rgba(30, 30, 30, 0.8) !important;
+    color: #e0e0e0 !important;
 }
 
-#downloadVideoButton:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
+.chartjs-tooltip-key {
+    border-color: #e0e0e0 !important;
 }
 
 @media only screen and (max-width: 428px) {
     :root {
-        --chart-width: 70vw;
+        --chart-width: 95%;
         --chart-height: 70vh;
-        --font-size-title: 30px;
-        --font-size-legend: 24px;
-        --font-size-axis: 24px;
+        --font-size-title: 24px;
+        --font-size-legend: 12px;
+        --font-size-axis: 14px;
     }
-}
 
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    background-color: #121212;
-    color: #e0e0e0;
-}
+    #mainChartContainer {
+        width: var(--chart-width);
+        height: 95vh;
+    }
 
-#chartContainer {
-    width: var(--chart-width);
-    height: var(--chart-height);
-    position: relative;
-    margin-top: 160px;
-    margin-left : 5% 
-}
+    #chartTitle {
+        font-size: var(--font-size-title);
+        padding: 10px 0 5px;
+    }
 
-#marketCapChart {
-    width: 100% !important;
-    height: 100% !important;
-}
+    #chartLegend {
+        font-size: var(--font-size-legend);
+        padding: 5px 0;
+    }
 
-#chartTitle {
-    font-size: var(--font-size-title);
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    text-align: center;
-}
+    #currentDate {
+        font-size: 18px;
+        margin-right: 2%;
+        padding: 5px 10px;
+    }
 
-#chartLegend {
-    font-size: 8 px;
-    position: absolute;
-    top: calc(var(--font-size-title) + 60px);
-    left: 0;
-    right: 0;
-    text-align: center;
-}
+    #yAxisTitle {
+        left: -10%;
+        font-size: var(--font-size-axis);
+    }
 
-#yAxisTitle, #xAxisTitle {
-    font-size: var(--font-size-axis);
-    position: absolute;
-}
+    #xAxisTitle {
+        bottom: -30px;
+        font-size: var(--font-size-axis);
+    }
 
-#yAxisTitle {
-    left: calc(-1* var(--font-size-axis));
-    top: 30%;
-    left: -28%;
-    transform: rotate(90deg);
-}
+    #finalRankingContainer {
+        width: 150px;
+        padding: 5px;
+    }
 
-#xAxisTitle {
-    bottom: calc(-1 * var(--font-size-axis));
-    left: 50%;
-    bottom : 0.3%;
-    transform: translateX(-50%);
-}
+    #finalRankingContainer h2 {
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
 
-#currentDate {
-    font-size: var(--font-size-legend);
-    position: absolute;
-    top: -3.5%;
-    right: 4%;
+    .rank-item {
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+    .company-logo {
+        width: 30px;
+        height: 30px;
+        margin-right: 10px;
+    }
+
+    #animateButton {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
 }
