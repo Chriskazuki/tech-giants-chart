@@ -84,7 +84,7 @@
             );
             const allData = await Promise.all(dataPromises);
             const processData = (data) => data
-                .filter(item => new Date(item.x).getFullYear() >= 2014) // Filtre les données à partir de 2014
+                .filter(item => new Date(item.x).getFullYear() >= 2010) // Filtre les données à partir de 2014
                 .map(item => ({
                     x: new Date(item.x),
                     y: item.y / 1e9  // Convert to billions
@@ -102,7 +102,7 @@
         
         const isMobile = window.innerWidth <= 428;
         
-        const totalDuration = isMobile ? 20000 : 20000;
+        const totalDuration = isMobile ? 20000 : 15000;
         const maxDataPoints = Math.max(...Object.values(data).map(d => d.length));
         console.log("Max data points:", maxDataPoints);
         const delayBetweenPoints = Math.max(20, totalDuration / maxDataPoints);
@@ -276,7 +276,7 @@
                             chart.update('none');
 
                             if (window.currentTime !== undefined) {
-                                window.currentTime += delayBetweenPoints * 2;
+                                window.currentTime += delayBetweenPoints * 3;
                                 requestAnimationFrame(() => chart.draw());
                             }
                         } else {
