@@ -252,7 +252,7 @@
                     id: 'customAnimation',
                     afterDraw: (chart) => {
                         if (currentDataIndex < Math.max(...Object.values(data).map(d => d.length)) - 1) {
-                            currentDataIndex++;
+                           currentDataIndex += 5;
                             companies.forEach((company, index) => {
                                 const currentData = data[company.name][Math.min(currentDataIndex, data[company.name].length - 1)];
                                 chart.data.datasets[index].data = data[company.name].slice(0, currentDataIndex + 1);
