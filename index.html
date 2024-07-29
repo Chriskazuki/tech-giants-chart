@@ -102,10 +102,10 @@
         
         const isMobile = window.innerWidth <= 428;
         
-        const totalDuration = isMobile ? 20000 : 625;
+        const totalDuration = isMobile ? 20000 : 15000;
         const maxDataPoints = Math.max(...Object.values(data).map(d => d.length));
         console.log("Max data points:", maxDataPoints);
-        const delayBetweenPoints = Math.max(1, totalDuration / maxDataPoints);
+        const delayBetweenPoints = Math.max(20, totalDuration / maxDataPoints);
         let currentDataIndex = 0;
             const animation = {
                 x: {
@@ -252,7 +252,7 @@
                     id: 'customAnimation',
                     afterDraw: (chart) => {
                         if (currentDataIndex < Math.max(...Object.values(data).map(d => d.length)) - 1) {
-                           currentDataIndex += 5;
+                            currentDataIndex+=2;
                             companies.forEach((company, index) => {
                                 const currentData = data[company.name][Math.min(currentDataIndex, data[company.name].length - 1)];
                                 chart.data.datasets[index].data = data[company.name].slice(0, currentDataIndex + 1);
@@ -276,7 +276,7 @@
                             chart.update('none');
 
                             if (window.currentTime !== undefined) {
-                                window.currentTime += delayBetweenPoints;
+                                window.currentTime += delayBetweenPoints * 2;
                                 requestAnimationFrame(() => chart.draw());
                             }
                         } else {
