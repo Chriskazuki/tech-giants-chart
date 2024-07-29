@@ -1,9 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
+@font-face {
+    font-family: 'Neue Haas Display Black';
+    src: url('NeueHaasDisplayBlack.ttf') format('truetype');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Neue Haas Display';
+    src: url('NeueHaasDisplayRoman.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
 :root {
     --chart-width: 100%;
     --chart-height: 100vh;
     --font-size-title: 32px;
-    --font-size-legend: 16px;
-    --font-size-axis: 16px;
+    --font-size-legend: 14px;
+    --font-size-axis: 12px;
+    --padding-chart: 20px;
 }
 
 body {
@@ -34,9 +53,9 @@ body {
 }
 
 #yAxisTitle {
-    left: -28%;
-    top: 30%;
-    transform: rotate(90deg);
+    left: 15px;
+    top: 10px;
+    transform: none;
 }
 
 #xAxisTitle {
@@ -96,7 +115,7 @@ body {
     color: #ffffff;
     position: relative;
     top: 80px;
-    right: 20%;
+    right: 20px;
     z-index: 1001;
     padding: 10px 15px;
     border-radius: 5px;
@@ -107,7 +126,7 @@ body {
     width: 100vw;
     height: calc(100vh - 110px);
     position: relative;
-    margin-top: 160px;
+    margin-top: 110px;
     padding-bottom: 60px;
 }
 
@@ -132,11 +151,11 @@ body {
 #finalRankingContainer {
     display: none;
     position: absolute;
-    top: 15%;
-    left: 22%;
-    width: 10px;
+    top: 140px;
+    left: 100px;
+    width: 250px;
     background-color: rgba(18, 18, 18, 0.9);
-    padding: 10px;
+    padding: 30px;
     border-radius: 10px;
     z-index: 1000;
     font-family: 'Neue Haas Display', Helvetica, Arial, sans-serif;
@@ -195,12 +214,10 @@ body {
     cursor: pointer;
     transition: background-color 0.3s;
     margin: 0 10px;
-    display: none;
 }
 
 #animateButton {
     background-color: #4CAF50;
-    display : none;
 }
 
 #downloadVideoButton {
@@ -225,9 +242,10 @@ body {
     :root {
         --chart-width: 70vw;
         --chart-height: 70vh;
-        --font-size-title: 30px;
-        --font-size-legend: 24px;
-        --font-size-axis: 24px;
+        --font-size-title: 16px;
+        --font-size-legend: 10px;
+        --font-size-axis: 8px;
+        --padding-chart: 5px;
     }
 }
 
@@ -245,8 +263,6 @@ body {
     width: var(--chart-width);
     height: var(--chart-height);
     position: relative;
-    margin-top: 160px;
-    margin-left : 5% 
 }
 
 #marketCapChart {
@@ -266,7 +282,7 @@ body {
 #chartLegend {
     font-size: 8 px;
     position: absolute;
-    top: calc(var(--font-size-title) + 60px);
+    top: calc(var(--font-size-title) + 80px);
     left: 0;
     right: 0;
     text-align: center;
@@ -279,21 +295,23 @@ body {
 
 #yAxisTitle {
     left: calc(-1* var(--font-size-axis));
-    top: 30%;
-    left: -28%;
-    transform: rotate(90deg);
+    top: -2%;
+    left: 3%;
+    transform: rotate(-45eg) translateX(-50%);
+    transform-origin: left top;
 }
 
 #xAxisTitle {
     bottom: calc(-1 * var(--font-size-axis));
     left: 50%;
-    bottom : 0.3%;
+    bottom : 20% ;
     transform: translateX(-50%);
 }
 
 #currentDate {
     font-size: var(--font-size-legend);
     position: absolute;
-    top: -3.5%;
-    right: 4%;
+    top: -1%;
+    right: 10%;
+    right: var(--padding-chart);
 }
