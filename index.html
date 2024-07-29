@@ -52,7 +52,7 @@
         speedControl.addEventListener('input', (e) => {
     animationSpeed = parseFloat(e.target.value);
 });
-
+     let data; // Declare data in a wider scope
         window.renderD3Video = function({ width, height }) {
         console.log("renderD3Video called with width:", width, "height:", height);
         return new Promise(resolve => {
@@ -346,7 +346,6 @@ function createCustomLegend(chart) {
 }
         // À la fin de votre script, après toutes les définitions de fonctions :
         console.log("Script started");
-        let data; // Declare data in a wider scope
         async function initializeChart() {
             console.log("initializeChart started");
             data = await loadData();
