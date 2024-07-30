@@ -34,7 +34,7 @@ body {
 }
 
 #yAxisTitle {
-    left: -28%;
+    left: -25%;
     top: 30%;
     transform: rotate(90deg);
 }
@@ -144,7 +144,7 @@ body {
 
 #finalRankingContainer h2 {
     font-family: 'Neue Haas Display Black', Helvetica, Arial, sans-serif;
-    font-size: 25px;
+    font-size: 18px;
     margin-bottom: 20px;
     text-align: center;
 }
@@ -177,9 +177,9 @@ body {
 #buttonContainer {
     display: flex;
     justify-content: center;
-    position: fixed;
-    bottom: 20px;
-    left: 0;
+    position: absolute;
+    bottom: -1%;
+    left: 25px;
     right: 0;
     z-index: 1000;
 }
@@ -273,7 +273,7 @@ body {
 #yAxisTitle {
     left: calc(-1* var(--font-size-axis));
     top: 30%;
-    left: -28%;
+    left: -25%;
     transform: rotate(90deg);
 }
 
