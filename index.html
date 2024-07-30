@@ -183,15 +183,9 @@
                                 },
                                 maxRotation: isMobile ? 45 : 0,
                                 autoSkip: true,
-                                maxTicksLimit: isMobile ? 5 : 10,
-
-                                callback: function (value, index, values) {
-                                    // Afficher uniquement les années jusqu'à la dernière année réelle
-                                    const year = new Date(value).getFullYear();
-                                    const maxYear = Math.max(...Object.values(data).flatMap(d => d.map(item => new Date(item.x).getFullYear())));
-                                    return year <= maxYear ? year.toString() : '';
-                                }
-                            },
+                                maxTicksLimit: isMobile ? 5 : 10, },
+                                min: new Date(Math.min(...Object.values(data).flatMap(d => d.map(item => item.x)))).getTime(),
+                                max: new Date(Math.max(...Object.values(data).flatMap(d => d.map(item => item.x)))).getTime(),
                             grid: {
                                 display: !isMobile
                             }
@@ -288,10 +282,10 @@
                 const currentDate = new Date(Math.max(...companies.map(company =>
                     data[company.name][Math.min(currentDataIndex, data[company.name].length - 1)].x
                 )));
-                const oldestDate = new Date(Math.min(...visibleData.map(d => d.x)));
-                const range = currentDate - oldestDate;
-                window.chart.options.scales.x.min = oldestDate;
-                window.chart.options.scales.x.max = new Date(currentDate.getTime() + range * 0.70);
+                 // const oldestDate = new Date(Math.min(...visibleData.map(d => d.x)));
+                 // const range = currentDate - oldestDate;
+                 // window.chart.options.scales.x.min = oldestDate;
+                 // window.chart.options.scales.x.max = new Date(currentDate.getTime() + range * 0.70);
                 document.getElementById('currentDate').textContent = moment(currentDate).format('MMMM D, YYYY');
                 window.chart.update('none');
                 if (progress < 1) {
@@ -344,8 +338,8 @@
                 window.chart.options.plugins.annotation.annotations[`${company.name}Value`].yValue = data[company.name][0].y;
             });
             window.chart.options.scales.y.max = Math.max(...Object.values(data).map(d => d[0].y)) * 1.1;
-            window.chart.options.scales.x.min = Object.values(data)[0][0].x;
-            window.chart.options.scales.x.max = moment(Object.values(data)[0][0].x).add(isMobile ? 3 : 8, 'years').toDate();
+            // window.chart.options.scales.x.min = Object.values(data)[0][0].x;
+            // window.chart.options.scales.x.max = moment(Object.values(data)[0][0].x).add(isMobile ? 3 : 8, 'years').toDate();
             document.getElementById('currentDate').textContent = moment(Object.values(data)[0][0].x).format(isMobile ? 'MM/DD/YY' : 'MMM D, YYYY');
             document.getElementById('finalRankingContainer').style.display = 'none';
             window.chart.update();
