@@ -45,6 +45,12 @@
             { name: 'Microsoft', file: 'msft_market_cap.json', color: 'rgba(54, 162, 235, 1)', logo: 'Microsoft_logo.svg' },
             { name: 'NVIDIA', file: 'nvidia_market_cap.json', color: 'rgba(153, 102, 255, 1)', logo: 'Nvidia_logo.svg' }
         ];
+        const isMobile = window.innerWidth <= 428;
+        const totalDuration = 30000;
+        let animationId;
+        let startTime;
+        let data;
+        let currentDataIndex = 0;
         window.renderD3Video = function({ width, height }) {
         console.log("renderD3Video called with width:", width, "height:", height);
         return new Promise(resolve => {
@@ -97,45 +103,43 @@
             ]));
         }
         async function createChart() {
-        const data = await loadData();
-        const ctx = document.getElementById('marketCapChart').getContext('2d');
-        
-        const isMobile = window.innerWidth <= 428;
-        
-        const totalDuration = isMobile ? 20000 : 15000;
-        const maxDataPoints = Math.max(...Object.values(data).map(d => d.length));
-        console.log("Max data points:", maxDataPoints);
-        const delayBetweenPoints = Math.max(20, totalDuration / maxDataPoints);
-        let currentDataIndex = 0;
-            const animation = {
-                x: {
-                    type: 'number',
-                    easing: 'linear',
-                    duration: delayBetweenPoints,
-                    from: NaN,
-                    delay(ctx) {
-                        if (ctx.type !== 'data' || ctx.xStarted) {
-                            return 0;
-                        }
-                        ctx.xStarted = true;
-                        return ctx.index * delayBetweenPoints;
-                    }
-                },
-                y: {
-                    type: 'number',
-                    easing: 'linear',
-                    duration: delayBetweenPoints,
-                    from: NaN,
-                    delay(ctx) {
-                        if (ctx.type !== 'data' || ctx.yStarted) {
-                            return 0;
-                        }
-                        ctx.yStarted = true;
-                        return ctx.index * delayBetweenPoints;
-                    }
+    const data = await loadData();
+    const ctx = document.getElementById('marketCapChart').getContext('2d');
+    const maxDataPoints = Math.max(...Object.values(data).map(d => d.length));
+    console.log("Max data points:", maxDataPoints);
+    const delayBetweenPoints = Math.max(20, totalDuration / maxDataPoints);
+    let currentDataIndex = 0;
+    
+    const animation = {
+        x: {
+            type: 'number',
+            easing: 'linear',
+            duration: delayBetweenPoints,
+            from: NaN,
+            delay(ctx) {
+                if (ctx.type !== 'data' || ctx.xStarted) {
+                    return 0;
                 }
-            };
-            const chartConfig = {
+                ctx.xStarted = true;
+                return ctx.index * delayBetweenPoints;
+            }
+        },
+        y: {
+            type: 'number',
+            easing: 'linear',
+            duration: delayBetweenPoints,
+            from: NaN,
+            delay(ctx) {
+                if (ctx.type !== 'data' || ctx.yStarted) {
+                    return 0;
+                }
+                ctx.yStarted = true;
+                return ctx.index * delayBetweenPoints;
+            }
+        }
+    };
+
+    const chartConfig = {
         type: 'line',
         data: {
             datasets: companies.map(company => ({
@@ -230,88 +234,86 @@
                                 size: isMobile ? 8 : 12
                             },
                             borderRadius: isMobile ? 2 : 4,
-                            xAdjust: isMobile ? 50 : 100,
-                            yAdjust: 0,
                             xAdjust: 50,
+                            yAdjust: 0,
                             textAlign: 'left',
-                            xAlign: 'left', // Changé à 'left' pour plus de flexibilité
+                            xAlign: 'left',
                             yAlign: 'center',
                             callout: {
-                display: true,
-                borderColor: company.color,
-                borderWidth: 2,
-                side: 'left',
-                length: 3
-            }
+                                display: true,
+                                borderColor: company.color,
+                                borderWidth: 2,
+                                side: 'left',
+                                length: 3
+                            }
                         }
                     ]))
                 }
             }
-        },
-                plugins: [{
-                    id: 'customAnimation',
-                    afterDraw: (chart) => {
-                        if (currentDataIndex < Math.max(...Object.values(data).map(d => d.length)) - 1) {
-                            currentDataIndex+=2;
-                            companies.forEach((company, index) => {
-                                const currentData = data[company.name][Math.min(currentDataIndex, data[company.name].length - 1)];
-                                chart.data.datasets[index].data = data[company.name].slice(0, currentDataIndex + 1);
-                                chart.options.plugins.annotation.annotations[`${company.name}Value`].content = `${company.name}: $${currentData.y.toFixed(2)}B`;
-                                chart.options.plugins.annotation.annotations[`${company.name}Value`].xValue = currentData.x;
-                                chart.options.plugins.annotation.annotations[`${company.name}Value`].yValue = currentData.y;
-                            });
-                            const visibleData = chart.data.datasets.flatMap(dataset => dataset.data);
-                            const maxValue = Math.max(...visibleData.map(d => d.y));
-                            chart.options.scales.y.max = maxValue * 1.1;
-                            const currentDate = new Date(Math.max(...companies.map(company => 
-                                data[company.name][Math.min(currentDataIndex, data[company.name].length - 1)].x
-                            )));
-                             // Mise à jour dynamique de l'axe des x
-                            const oldestDate = new Date(Math.min(...visibleData.map(d => d.x)));
-                            const range = currentDate - oldestDate;
-                            chart.options.scales.x.min = oldestDate;
-                            chart.options.scales.x.max = new Date(currentDate.getTime() + range * 0.70); // Ajoute 10% de la plage visible
-                            document.getElementById('currentDate').textContent = moment(currentDate).format('MMMM D, YYYY');
-
-                            chart.update('none');
-
-                            if (window.currentTime !== undefined) {
-                                window.currentTime += delayBetweenPoints * 3;
-                                requestAnimationFrame(() => chart.draw());
-                            }
-                        } else {
-                            const finalValues = companies.map(company => ({
-                                name: company.name,
-                                logo: company.logo,
-                                value: data[company.name][data[company.name].length - 1].y
-                            }));
-                            finalValues.sort((a, b) => b.value - a.value);
-                            const rankingHtml = finalValues.map((company, index) => 
-                                `<div class="rank-item">
-                                    <span class="rank">${index + 1}</span>
-                                    <img src="${company.logo}" alt="${company.name}" class="company-logo">
-                                    <span class="value">$${company.value.toFixed(2)}B</span>
-                                 </div>`
-                            ).join('');
-                            document.getElementById('finalRanking').innerHTML = rankingHtml;
-                            document.getElementById('finalRankingContainer').style.display = 'block';
-                        }
-                    }
-                }]
-            };
-
-            window.chart = new Chart(ctx, chartConfig);
-            createCustomLegend(window.chart);
-
-            setTimeout(() => {
-                if (window.currentTime !== undefined) {
-                    window.renderD3Video({ width: 1920, height: 1080 }).then(() => {
-                        startAnimation();
-                    });
-                }
-            }, 100);
-            return window.chart;
         }
+    };
+
+    window.chart = new Chart(ctx, chartConfig);
+    createCustomLegend(window.chart);
+
+    return window.chart;
+}
+        
+        function animate(timestamp) {
+    if (!startTime) startTime = timestamp;
+    const elapsed = timestamp - startTime;
+    const progress = Math.min(elapsed / totalDuration, 1);
+    
+    currentDataIndex = Math.floor(progress * (Math.max(...Object.values(data).map(d => d.length)) - 1));
+    
+    if (currentDataIndex < Math.max(...Object.values(data).map(d => d.length)) - 1) {
+        companies.forEach((company, index) => {
+            const currentData = data[company.name][Math.min(currentDataIndex, data[company.name].length - 1)];
+            window.chart.data.datasets[index].data = data[company.name].slice(0, currentDataIndex + 1);
+            window.chart.options.plugins.annotation.annotations[`${company.name}Value`].content = `${company.name}: $${currentData.y.toFixed(2)}B`;
+            window.chart.options.plugins.annotation.annotations[`${company.name}Value`].xValue = currentData.x;
+            window.chart.options.plugins.annotation.annotations[`${company.name}Value`].yValue = currentData.y;
+        });
+
+        const visibleData = window.chart.data.datasets.flatMap(dataset => dataset.data);
+        const maxValue = Math.max(...visibleData.map(d => d.y));
+        window.chart.options.scales.y.max = maxValue * 1.1;
+
+        const currentDate = new Date(Math.max(...companies.map(company => 
+            data[company.name][Math.min(currentDataIndex, data[company.name].length - 1)].x
+        )));
+
+        const oldestDate = new Date(Math.min(...visibleData.map(d => d.x)));
+        const range = currentDate - oldestDate;
+        window.chart.options.scales.x.min = oldestDate;
+        window.chart.options.scales.x.max = new Date(currentDate.getTime() + range * 0.70);
+        document.getElementById('currentDate').textContent = moment(currentDate).format('MMMM D, YYYY');
+
+        window.chart.update('none');
+
+        if (progress < 1) {
+            animationId = requestAnimationFrame(animate);
+        }
+    } else {
+        // Animation terminée
+        const finalValues = companies.map(company => ({
+            name: company.name,
+            logo: company.logo,
+            value: data[company.name][data[company.name].length - 1].y
+        }));
+        finalValues.sort((a, b) => b.value - a.value);
+        const rankingHtml = finalValues.map((company, index) => 
+            `<div class="rank-item">
+                <span class="rank">${index + 1}</span>
+                <img src="${company.logo}" alt="${company.name}" class="company-logo">
+                <span class="value">$${company.value.toFixed(2)}B</span>
+             </div>`
+        ).join('');
+        document.getElementById('finalRanking').innerHTML = rankingHtml;
+        document.getElementById('finalRankingContainer').style.display = 'block';
+    }
+}
+        
         function createCustomLegend(chart) {
             const legendContainer = document.getElementById('chartLegend');
             legendContainer.innerHTML = chart.data.datasets.map(dataset => 
@@ -330,7 +332,23 @@
         return;
     }
     
-    const isMobile = window.innerWidth <= 428;
+    cancelAnimationFrame(animationId);
+    startTime = null;
+    currentDataIndex = 0;
+    companies.forEach((company, index) => {
+        window.chart.data.datasets[index].data = [data[company.name][0]];
+        window.chart.options.plugins.annotation.annotations[`${company.name}Value`].content = isMobile ? company.name : `${company.name}: $${data[company.name][0].y.toFixed(2)}B`;
+        window.chart.options.plugins.annotation.annotations[`${company.name}Value`].xValue = data[company.name][0].x;
+        window.chart.options.plugins.annotation.annotations[`${company.name}Value`].yValue = data[company.name][0].y;
+    });
+    window.chart.options.scales.y.max = Math.max(...Object.values(data).map(d => d[0].y)) * 1.1;
+    window.chart.options.scales.x.min = Object.values(data)[0][0].x;
+    window.chart.options.scales.x.max = moment(Object.values(data)[0][0].x).add(isMobile ? 3 : 8, 'years').toDate();
+    document.getElementById('currentDate').textContent = moment(Object.values(data)[0][0].x).format(isMobile ? 'MM/DD/YY' : 'MMM D, YYYY');
+    document.getElementById('finalRankingContainer').style.display = 'none';
+    window.chart.update();
+    
+    animationId = requestAnimationFrame(animate);
     currentDataIndex = 0;
     companies.forEach((company, index) => {
         window.chart.data.datasets[index].data = [data[company.name][0]];
@@ -351,7 +369,6 @@
 }
         // À la fin de votre script, après toutes les définitions de fonctions :
         console.log("Script started");
-        let data; // Declare data in a wider scope
         async function initializeChart() {
             console.log("initializeChart started");
             data = await loadData();
