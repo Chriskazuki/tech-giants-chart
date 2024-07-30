@@ -310,7 +310,17 @@
             logo: company.logo,
             value: data[company.name][data[company.name].length - 1].y
         }));
-        finalValues.sort((a, b) => b.value - a.value);
+        finalValues.sort((a, b) => b.value - a.value)
+        // Aligner les labels à la fin de l'animation
+        const maxX = Math.max(...companies.map(company => 
+            data[company.name][data[company.name].length - 1].x
+        ));
+        companies.forEach((company, index) => {
+            const finalData = data[company.name][data[company.name].length - 1];
+            window.chart.options.plugins.annotation.annotations[`${company.name}Value`].xValue = maxX;
+            window.chart.options.plugins.annotation.annotations[`${company.name}Value`].yValue = finalData.y;
+            window.chart.options.plugins.annotation.annotations[`${company.name}Value`].content = `${company.name}: $${finalData.y.toFixed(2)}B`;
+        });
         const rankingHtml = finalValues.map((company, index) => 
             `<div class="rank-item">
                 <span class="rank">${index + 1}</span>
@@ -320,6 +330,9 @@
         ).join('');
         document.getElementById('finalRanking').innerHTML = rankingHtml;
         document.getElementById('finalRankingContainer').style.display = 'block';
+        // Ajuster l'échelle X pour s'assurer que tous les labels sont visibles
+        window.chart.options.scales.x.max = new Date(maxX.getTime() + 1000 * 60 * 60 * 24 * 365); // Ajouter un an
+        window.chart.update();
     }
 }
         
@@ -352,7 +365,7 @@
     });
     window.chart.options.scales.y.max = Math.max(...Object.values(data).map(d => d[0].y)) * 1.1;
     window.chart.options.scales.x.min = Object.values(data)[0][0].x;
-    window.chart.options.scales.x.max = moment(Object.values(data)[0][0].x).add(isMobile ? 3 : 8, 'years').toDate();
+    window.chart.options.scales.x.max = moment(Object.values(data)[0][0].x).add(isMobile ? 1 : 8, 'years').toDate();
     document.getElementById('currentDate').textContent = moment(Object.values(data)[0][0].x).format(isMobile ? 'MM/DD/YY' : 'MMM D, YYYY');
     document.getElementById('finalRankingContainer').style.display = 'none';
     window.chart.update();
@@ -367,7 +380,7 @@
     });
     window.chart.options.scales.y.max = Math.max(...Object.values(data).map(d => d[0].y)) * 1.1;
     window.chart.options.scales.x.min = Object.values(data)[0][0].x;
-    window.chart.options.scales.x.max = moment(Object.values(data)[0][0].x).add(isMobile ? 3 : 8, 'years').toDate();
+    window.chart.options.scales.x.max = moment(Object.values(data)[0][0].x).add(isMobile ? 1 : 8, 'years').toDate();
     document.getElementById('currentDate').textContent = moment(Object.values(data)[0][0].x).format(isMobile ? 'MM/DD/YY' : 'MMM D, YYYY');
     document.getElementById('finalRankingContainer').style.display = 'none';
     window.chart.update();
