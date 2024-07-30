@@ -115,7 +115,7 @@ body {
     height: 428px;
     position: absolute;
     top: 20px;
-    left: 23px;
+    left: -4px;
     background-color: transparent !important;
 }
 
@@ -131,11 +131,11 @@ body {
 #finalRankingContainer {
     display: none;
     position: absolute;
-    top: 15%;
-    left: 22%;
+    top: 16%;
+    left: 24%;
     width: 10px;
     background-color: rgba(18, 18, 18, 0.9);
-    padding: 10px;
+    padding: 1px;
     border-radius: 10px;
     z-index: 1000;
     font-family: 'Neue Haas Display', Helvetica, Arial, sans-serif;
@@ -144,8 +144,8 @@ body {
 
 #finalRankingContainer h2 {
     font-family: 'Neue Haas Display Black', Helvetica, Arial, sans-serif;
-    font-size: 18px;
-    margin-bottom: 20px;
+    font-size: 17px;
+    margin-bottom: 9px;
     text-align: center;
 }
 
@@ -153,21 +153,21 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
-    font-size: 16px;
+    margin-bottom: 12px;
+    font-size: 14px;
 }
 
 .rank {
     font-weight: bold;
     margin-right: 5px;
-    min-width: 20px;
+    min-width: 25px;
 }
 
 .company-logo {
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
     object-fit: contain;
-    margin-right: 15px;
+    margin-right: 20px;
 }
 
 .value {
@@ -278,7 +278,7 @@ body {
 }
 
 #xAxisTitle {
-    bottom: calc(-1 * var(--font-size-axis));
+    bottom: calc(-1 * var(--font-size-axis) - 14px);
     left: 50%;
     transform: translateX(-50%);
 }
