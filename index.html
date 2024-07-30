@@ -182,7 +182,14 @@
                         },
                         maxRotation: isMobile ? 45 : 0,
                         autoSkip: true,
-                        maxTicksLimit: isMobile ? 5 : 10
+                        maxTicksLimit: isMobile ? 5 : 10,
+                        
+                        callback: function(value, index, values) {
+                            // Afficher uniquement les années jusqu'à la dernière année réelle
+                            const year = new Date(value).getFullYear();
+                            const maxYear = Math.max(...Object.values(data).flatMap(d => d.map(item => new Date(item.x).getFullYear())));
+                            return year <= maxYear ? year.toString() : '';
+                        }
                     },
                     grid: { 
                         display: !isMobile 
