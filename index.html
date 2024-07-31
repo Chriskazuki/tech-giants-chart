@@ -109,10 +109,18 @@
         async function createChart() {
             const data = await loadData();
             const ctx = document.getElementById('marketCapChart').getContext('2d');
+
+            const allDates = Object.values(data).flatMap(d => d.map(item => item.x));
+            const minDate = new Date(Math.min(...allDates));
+            const maxDate = new Date(Math.max(...allDates));
+            
+            const startYear = minDate.getFullYear();
+            const endYear = maxDate.getFullYear();
+            const numberOfTicks = endYear - startYear + 1;
+            const yearStep = Math.ceil((endYear - startYear) / (numberOfTicks - 1));
             const maxDataPoints = Math.max(...Object.values(data).map(d => d.length));
-            console.log("Max data points:", maxDataPoints);
             const delayBetweenPoints = Math.max(20, totalDuration / maxDataPoints);
-            let currentDataIndex = 0;
+
 
             const animation = {
                 x: {
@@ -172,42 +180,45 @@
                     },
                     scales: {
                         x: {
-                            type: 'time',
-                            time: { unit: 'year' },
-                            title: {
-                                display: false,
-                            },
-                            ticks: {
-                                font: {
-                                    size: isMobile ? 8 : 12
-                                },
-                                maxRotation: isMobile ? 45 : 0,
-                                autoSkip: true,
-                                maxTicksLimit: isMobile ? 5 : 10,
-
-                                callback: function (value, index, values) {
-                                    // Afficher uniquement les années jusqu'à la dernière année réelle
-                                    const year = new Date(value).getFullYear();
-                                    const maxYear = Math.max(...Object.values(data).flatMap(d => d.map(item => new Date(item.x).getFullYear())));
-                                    return year <= maxYear ? year.toString() : '';
-                                }
-                            },
-                            grid: {
-                                display: !isMobile
-                            }
-                        },
+    type: 'time',
+    time: {
+        unit: 'year',
+        displayFormats: {
+            year: 'YYYY'
+        }
+    },
+    min: new Date(2010, 0, 1),
+    max: new Date(2024, 11, 31),
+    ticks: {
+        source: 'auto',
+        autoSkip: false,
+        maxTicksLimit: 8,
+        maxRotation: isMobile ? 45 : 0,
+        font: {
+            size: isMobile ? 8 : 12
+        },
+        callback: function(value, index, values) {
+            const year = new Date(value).getFullYear();
+            if (index === 0 || index === values.length - 1 || index % 2 === 0) {
+                return year.toString();
+        }
+        return null;
+    }},
+    grid: {
+        display: !isMobile
+    }
+},
                         y: {
                             title: {
                                 display: false
                             },
                             ticks: {
-                                callback: function (value, index, values) {
-                                    return '$' + Math.round(value) + (isMobile ? '' : 'B');
-                                },
-                                font: {
-                                    size: isMobile ? 8 : 12
-                                }
-                            },
+    source: 'data',
+    autoSkip: false,
+    callback: function(value, index, values) {
+            return '$' + value.toFixed(0) + 'B';
+        }
+},
                             grid: {
                                 color: 'rgba(255, 255, 255, 0.1)',
                                 lineWidth: isMobile ? 0.5 : 1
@@ -262,60 +273,58 @@
                     }
                 }
             };
+            const maxDataDate = getMaxDate(data);
+            const extraMonths = 6; // Ajoutez 6 mois d'espace supplémentaire
+            chartConfig.options.scales.x.max = new Date(maxDataDate.getFullYear(),
+            maxDataDate.getMonth() + extraMonths, 1);
+
             window.chart = new Chart(ctx, chartConfig);
             createCustomLegend(window.chart);
             return window.chart;
         }
 
-        function animate(timestamp) {
-            if (!startTime) startTime = timestamp;
-            const elapsed = timestamp - startTime;
-            const progress = Math.min(elapsed / totalDuration, 1);
+        function getMaxDate(data) {
+    return new Date(Math.max(...Object.values(data).flatMap(d => d.map(item => item.x.getTime()))));
+}
 
-            currentDataIndex = Math.floor(progress * (Math.max(...Object.values(data).map(d => d.length)) - 1));
 
-            if (currentDataIndex < Math.max(...Object.values(data).map(d => d.length)) - 1) {
-                companies.forEach((company, index) => {
-                    const currentData = data[company.name][Math.min(currentDataIndex, data[company.name].length - 1)];
-                    window.chart.data.datasets[index].data = data[company.name].slice(0, currentDataIndex + 1);
-                    window.chart.options.plugins.annotation.annotations[`${company.name}Value`].content = `${company.name}: $${currentData.y.toFixed(2)}B`;
-                    window.chart.options.plugins.annotation.annotations[`${company.name}Value`].xValue = currentData.x;
-                    window.chart.options.plugins.annotation.annotations[`${company.name}Value`].yValue = currentData.y;
-                });
-                const visibleData = window.chart.data.datasets.flatMap(dataset => dataset.data);
-                const maxValue = Math.max(...visibleData.map(d => d.y));
-                window.chart.options.scales.y.max = maxValue * 1.1;
-                const currentDate = new Date(Math.max(...companies.map(company =>
-                    data[company.name][Math.min(currentDataIndex, data[company.name].length - 1)].x
-                )));
-                const oldestDate = new Date(Math.min(...visibleData.map(d => d.x)));
-                const range = currentDate - oldestDate;
-                window.chart.options.scales.x.min = oldestDate;
-                window.chart.options.scales.x.max = new Date(currentDate.getTime() + range * 0.70);
-                document.getElementById('currentDate').textContent = moment(currentDate).format('MMMM D, YYYY');
-                window.chart.update('none');
-                if (progress < 1) {
-                    animationId = requestAnimationFrame(animate);
-                }
-            } else {
-                // Animation terminée
-                const finalValues = companies.map(company => ({
-                    name: company.name,
-                    logo: company.logo,
-                    value: data[company.name][data[company.name].length - 1].y
-                }));
-                finalValues.sort((a, b) => b.value - a.value);
-                const rankingHtml = finalValues.map((company, index) =>
-                    `<div class="rank-item">
-                <span class="rank">${index + 1}</span>
-                <img src="${company.logo}" alt="${company.name}" class="company-logo">
-                <span class="value">$${company.value.toFixed(2)}B</span>
-             </div>`
-                ).join('');
-                document.getElementById('finalRanking').innerHTML = rankingHtml;
-                document.getElementById('finalRankingContainer').style.display = 'block';
-            }
+function animate(timestamp) {
+    if (!startTime) startTime = timestamp;
+    const elapsed = timestamp - startTime;
+    const progress = Math.min(elapsed / totalDuration, 1);
+
+    currentDataIndex = Math.floor(progress * (Math.max(...Object.values(data).map(d => d.length)) - 1));
+
+    if (progress < 1) {
+        companies.forEach((company, index) => {
+            const currentData = data[company.name][Math.min(currentDataIndex, data[company.name].length - 1)];
+            window.chart.data.datasets[index].data = data[company.name].slice(0, currentDataIndex + 1);
+            window.chart.options.plugins.annotation.annotations[`${company.name}Value`].content = isMobile ? company.name : `${company.name}: $${currentData.y.toFixed(2)}B`;
+            window.chart.options.plugins.annotation.annotations[`${company.name}Value`].xValue = currentData.x;
+            window.chart.options.plugins.annotation.annotations[`${company.name}Value`].yValue = currentData.y;
+        });
+
+        const currentDate = new Date(Math.max(...companies.map(company =>
+            data[company.name][Math.min(currentDataIndex, data[company.name].length - 1)].x
+        )));
+
+        const maxDataDate = getMaxDate(data);
+        if (currentDate <= maxDataDate) {
+            document.getElementById('currentDate').textContent = moment(currentDate).format('MMMM D, YYYY');
+            
+            // Ajuster l'échelle X pour avoir de l'espace supplémentaire
+            const extraMonths = 24; // Ajoutez 6 mois d'espace supplémentaire
+            window.chart.options.scales.x.max = new Date(maxDataDate.getFullYear(), maxDataDate.getMonth() + extraMonths, 1);
+            
+            window.chart.update('none');
+            animationId = requestAnimationFrame(animate);
+        } else {
+            showFinalRanking();
         }
+    } else {
+        showFinalRanking();
+    }
+}
         function createCustomLegend(chart) {
             const legendContainer = document.getElementById('chartLegend');
             legendContainer.innerHTML = chart.data.datasets.map(dataset =>
@@ -329,44 +338,29 @@
         }
         // ... (previous code remains the same)
         function startAnimation() {
-            if (!data || !window.chart) {
-                console.error('Data or chart not initialized');
-                return;
-            }
+    if (!data || !window.chart) {
+        console.error('Data or chart not initialized');
+        return;
+    }
 
-            cancelAnimationFrame(animationId);
-            startTime = null;
-            currentDataIndex = 0;
-            companies.forEach((company, index) => {
-                window.chart.data.datasets[index].data = [data[company.name][0]];
-                window.chart.options.plugins.annotation.annotations[`${company.name}Value`].content = isMobile ? company.name : `${company.name}: $${data[company.name][0].y.toFixed(2)}B`;
-                window.chart.options.plugins.annotation.annotations[`${company.name}Value`].xValue = data[company.name][0].x;
-                window.chart.options.plugins.annotation.annotations[`${company.name}Value`].yValue = data[company.name][0].y;
-            });
-            window.chart.options.scales.y.max = Math.max(...Object.values(data).map(d => d[0].y)) * 1.1;
-            window.chart.options.scales.x.min = Object.values(data)[0][0].x;
-            window.chart.options.scales.x.max = moment(Object.values(data)[0][0].x).add(isMobile ? 3 : 8, 'years').toDate();
-            document.getElementById('currentDate').textContent = moment(Object.values(data)[0][0].x).format(isMobile ? 'MM/DD/YY' : 'MMM D, YYYY');
-            document.getElementById('finalRankingContainer').style.display = 'none';
-            window.chart.update();
-            animationId = requestAnimationFrame(animate);
-            currentDataIndex = 0;
-            companies.forEach((company, index) => {
-                window.chart.data.datasets[index].data = [data[company.name][0]];
-                window.chart.options.plugins.annotation.annotations[`${company.name}Value`].content = isMobile ? company.name : `${company.name}: $${data[company.name][0].y.toFixed(2)}B`;
-                window.chart.options.plugins.annotation.annotations[`${company.name}Value`].xValue = data[company.name][0].x;
-                window.chart.options.plugins.annotation.annotations[`${company.name}Value`].yValue = data[company.name][0].y;
-            });
-            window.chart.options.scales.y.max = Math.max(...Object.values(data).map(d => d[0].y)) * 1.1;
-            window.chart.options.scales.x.min = Object.values(data)[0][0].x;
-            window.chart.options.scales.x.max = moment(Object.values(data)[0][0].x).add(isMobile ? 3 : 8, 'years').toDate();
-            document.getElementById('currentDate').textContent = moment(Object.values(data)[0][0].x).format(isMobile ? 'MM/DD/YY' : 'MMM D, YYYY');
-            document.getElementById('finalRankingContainer').style.display = 'none';
-            window.chart.update();
-            if (window.currentTime !== undefined) {
-                requestAnimationFrame(() => window.chart.draw());
-            }
-        }
+    cancelAnimationFrame(animationId);
+    startTime = null;
+    currentDataIndex = 0;
+    companies.forEach((company, index) => {
+        window.chart.data.datasets[index].data = [data[company.name][0]];
+        window.chart.options.plugins.annotation.annotations[`${company.name}Value`].content = isMobile ? company.name : `${company.name}: $${data[company.name][0].y.toFixed(2)}B`;
+        window.chart.options.plugins.annotation.annotations[`${company.name}Value`].xValue = data[company.name][0].x;
+        window.chart.options.plugins.annotation.annotations[`${company.name}Value`].yValue = data[company.name][0].y;
+    });
+    
+    document.getElementById('currentDate').textContent = moment(Object.values(data)[0][0].x).format('MMMM D, YYYY');
+    document.getElementById('finalRankingContainer').style.display = 'none';
+    
+    window.chart.update('none');
+    animationId = requestAnimationFrame(animate);
+}
+
+
         // À la fin de votre script, après toutes les définitions de fonctions :
         console.log("Script started");
         async function initializeChart() {
