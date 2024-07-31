@@ -274,7 +274,7 @@
                 }
             };
             const maxDataDate = getMaxDate(data);
-            const extraMonths = 6; // Ajoutez 6 mois d'espace supplémentaire
+            const extraMonths = 12; // Ajoutez 6 mois d'espace supplémentaire
             chartConfig.options.scales.x.max = new Date(maxDataDate.getFullYear(),
             maxDataDate.getMonth() + extraMonths, 1);
 
