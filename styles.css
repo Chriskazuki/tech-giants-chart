@@ -34,8 +34,8 @@ body {
 }
 
 #yAxisTitle {
-    left: -25%;
-    top: 30%;
+    left: -28%;
+    top: 44%;
     transform: rotate(90deg);
 }
 
@@ -272,8 +272,8 @@ body {
 
 #yAxisTitle {
     left: calc(-1* var(--font-size-axis));
-    top: 30%;
-    left: -25%;
+    left: -28%;
+    top: 44%;
     transform: rotate(90deg);
 }
 
