@@ -173,7 +173,7 @@
                     layout: {
                         padding: {
                             top: isMobile ? 10 : 20,
-                            right: isMobile ? 10 : 40,
+                            right: isMobile ? 10 : 20,
                             bottom: isMobile ? 60 : 10,
                             left: isMobile ? 15 : 40
                         }
@@ -313,7 +313,7 @@ function animate(timestamp) {
             document.getElementById('currentDate').textContent = moment(currentDate).format('MMMM D, YYYY');
             
             // Ajuster l'échelle X pour avoir de l'espace supplémentaire
-            const extraMonths = 90; // Ajoutez 6 mois d'espace supplémentaire
+            const extraMonths = 150; // Ajoutez 6 mois d'espace supplémentaire
             window.chart.options.scales.x.max = new Date(maxDataDate.getFullYear(), maxDataDate.getMonth() + extraMonths, 1);
             
             window.chart.update('none');
