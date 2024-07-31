@@ -313,7 +313,7 @@ function animate(timestamp) {
             document.getElementById('currentDate').textContent = moment(currentDate).format('MMMM D, YYYY');
             
             // Ajuster l'échelle X pour avoir de l'espace supplémentaire
-            const extraMonths = 120; // Ajoutez 6 mois d'espace supplémentaire
+            const extraMonths = 100; // Ajoutez 6 mois d'espace supplémentaire
             window.chart.options.scales.x.max = new Date(maxDataDate.getFullYear(), maxDataDate.getMonth() + extraMonths, 1);
             
             window.chart.update('none');
