@@ -318,6 +318,27 @@ function showFinalRanking() {
     document.getElementById('finalRanking').innerHTML = rankingHtml;
     document.getElementById('finalRankingContainer').style.display = 'block';
 }
+
+function alignAnnotations() {
+    const finalValues = companies.map(company => ({
+        name: company.name,
+        value: data[company.name][data[company.name].length - 1].y
+    }));
+    finalValues.sort((a, b) => b.value - a.value);
+
+    const maxDate = getMaxDate(data);
+    const xPosition = maxDate.getTime();
+    
+    finalValues.forEach((company, index) => {
+        const annotation = window.chart.options.plugins.annotation.annotations[`${company.name}Value`];
+        annotation.xValue = xPosition;
+        annotation.yValue = company.value;
+        annotation.yAdjust = index * 30; // Adjust vertical spacing between labels
+    });
+
+    window.chart.update('none');
+}
+
         
         function getMaxDate(data) {
     return new Date(Math.max(...Object.values(data).flatMap(d => d.map(item => item.x.getTime()))));
@@ -355,9 +376,11 @@ function animate(timestamp) {
             window.chart.update('none');
             animationId = requestAnimationFrame(animate);
         } else {
+            alignAnnotations();
             showFinalRanking();
         }
     } else {
+        alignAnnotations();
         showFinalRanking();
     }
 }
