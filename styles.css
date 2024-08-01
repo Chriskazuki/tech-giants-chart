@@ -45,7 +45,7 @@ body {
     font-weight: 900;
     color: #ffffff;
     position: absolute;
-    left: 50%;
+    left: 49%;
     transform: translateX(-50%);
     padding-bottom: 60px;
     z-index: 1000;
@@ -178,7 +178,7 @@ body {
     display: flex;
     justify-content: center;
     position: absolute;
-    bottom: -1%;
+    bottom: -3%;
     left: 25px;
     right: 0;
     z-index: 1000;
@@ -259,10 +259,10 @@ body {
 #chartContainer::after {
     content: '';
     position: absolute;
-    top: 0;
-    right: 0;
+    top: 550px;
+    right: -70px;
     bottom: 0;
-    width: 10%; /* Ajustez selon vos besoins */
+    width: 75%; /* Ajustez selon vos besoins */
     background: linear-gradient(to right, rgba(18, 18, 18, 0), rgba(18, 18, 18, 1));
     pointer-events: none;
 }
@@ -290,7 +290,7 @@ body {
 }
 
 #xAxisTitle {
-    bottom: calc(-1 * var(--font-size-axis) - 14px);
+    bottom: calc(-1 * var(--font-size-axis) - 14.8px);
     left: 50%;
     transform: translateX(-50%);
 }
