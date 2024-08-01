@@ -201,7 +201,7 @@
     const year = new Date(value).getFullYear();
     const maxDataYear = getMaxDate(data).getFullYear();
     if (year > maxDataYear) {
-        return '...';
+        return null; // Ne pas afficher les années futures
     }
     if (index === 0 || index === values.length - 1 || index % 2 === 0) {
         return year.toString();
@@ -258,7 +258,19 @@
                                     padding: isMobile ? 2 : 6,
                                     font: {
                                         size: isMobile ? 8 : 12
+                                    },lastDataPoint: {
+                                    type: 'label',
+                                    xValue: getMaxDate(data),
+                                    yValue: 'top',
+                                    content: 'Last data point',
+                                    font: {
+                                        size: 10,
+                                        style: 'italic'
                                     },
+                                    color: 'rgba(255, 255, 255, 0.5)',
+                                    xAdjust: -30,
+                                    yAdjust: 10
+                                        },
                                     borderRadius: isMobile ? 2 : 4,
                                     xAdjust: 50,
                                     yAdjust: 0,
