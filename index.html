@@ -329,11 +329,24 @@ function alignAnnotations() {
     const maxDate = getMaxDate(data);
     const xPosition = maxDate.getTime();
     
+    const chartArea = window.chart.chartArea;
+    const yScale = window.chart.scales.y;
+    
     finalValues.forEach((company, index) => {
         const annotation = window.chart.options.plugins.annotation.annotations[`${company.name}Value`];
         annotation.xValue = xPosition;
         annotation.yValue = company.value;
-        annotation.yAdjust = index * 30; // Adjust vertical spacing between labels
+        
+        // Calculate vertical position based on chart area
+        const yPixel = yScale.getPixelForValue(company.value);
+        const topPadding = 20;
+        const spacing = (chartArea.bottom - chartArea.top - topPadding) / (finalValues.length - 1);
+        const targetY = chartArea.top + topPadding + spacing * index;
+        
+        annotation.yAdjust = targetY - yPixel;
+        
+        // Update content to match ranking display
+        annotation.content = `${company.name}: $${company.value.toFixed(2)}B`;
     });
 
     window.chart.update('none');
@@ -376,11 +389,11 @@ function animate(timestamp) {
             window.chart.update('none');
             animationId = requestAnimationFrame(animate);
         } else {
-            alignAnnotations();
+            setTimeout(alignAnnotations, 100);
             showFinalRanking();
         }
     } else {
-        alignAnnotations();
+        setTimeout(alignAnnotations, 100);
         showFinalRanking();
     }
 }
