@@ -256,6 +256,18 @@ body {
     text-align: center;
 }
 
+#chartContainer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 10%; /* Ajustez selon vos besoins */
+    background: linear-gradient(to right, rgba(18, 18, 18, 0), rgba(18, 18, 18, 1));
+    pointer-events: none;
+}
+
+
 #chartLegend {
     font-size: 8 px;
     position: absolute;
