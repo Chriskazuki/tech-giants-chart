@@ -389,11 +389,11 @@ function animate(timestamp) {
             window.chart.update('none');
             animationId = requestAnimationFrame(animate);
         } else {
-            setTimeout(alignAnnotations, 100);
+           //  setTimeout(alignAnnotations, 100);
             showFinalRanking();
         }
     } else {
-        setTimeout(alignAnnotations, 100);
+       //  setTimeout(alignAnnotations, 100);
         showFinalRanking();
     }
 }
